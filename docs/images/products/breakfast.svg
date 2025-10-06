@@ -1,0 +1,14 @@
+<svg width="300" height="200" viewBox="0 0 300 200" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="breakfastGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#FFD700;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#FFA500;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <rect width="300" height="200" fill="#f8f9fa"/>
+  <ellipse cx="150" cy="100" rx="50" ry="30" fill="url(#breakfastGrad)" stroke="#8B4513" stroke-width="2"/>
+  <circle cx="130" cy="90" r="8" fill="#FFD700"/>
+  <circle cx="170" cy="90" r="8" fill="#FFD700"/>
+  <circle cx="150" cy="110" r="6" fill="#FFA500"/>
+  <rect x="140" y="120" width="20" height="8" fill="#8B4513" rx="2"/>
+</svg>
