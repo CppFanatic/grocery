@@ -1,0 +1,15 @@
+<svg width="300" height="200" viewBox="0 0 300 200" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="drinkGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#87CEEB;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#4169E1;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <rect width="300" height="200" fill="#f8f9fa"/>
+  <rect x="120" y="80" width="60" height="80" fill="url(#drinkGrad)" stroke="#8B4513" stroke-width="2" rx="5"/>
+  <rect x="125" y="75" width="50" height="10" fill="#8B4513" rx="3"/>
+  <circle cx="150" cy="100" r="3" fill="#FFD700"/>
+  <circle cx="150" cy="110" r="2" fill="#FFD700"/>
+  <circle cx="150" cy="120" r="3" fill="#FFD700"/>
+  <text x="150" y="190" font-family="Arial, sans-serif" font-size="16" font-weight="bold" text-anchor="middle" fill="#333">🥤 Напитки</text>
+</svg>
