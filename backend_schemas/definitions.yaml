@@ -1,0 +1,55 @@
+components:
+    parameters:
+        CompanyId:
+            in: header
+            name: X-Company-ID
+            description: Company identifier.
+            schema:
+                type: string
+                minLength: 1
+        MerchantName:
+            in: header
+            name: X-Merchant-Name
+            description: Merchant name.
+            schema:
+                type: string
+                minLength: 1
+
+    schemas:
+        EmptyRequest:
+            type: object
+            description: Empty request
+            additionalProperties: false
+            properties: {}
+
+        ErrorReason:
+            type: string
+            description: Reason for error response
+            enum:
+              - grid_not_found
+
+        ResponseBodyError:
+            type: object
+            additionalProperties: false
+            required:
+              - reason
+            properties:
+                reason:
+                    description: Machine-readable code. Example "incorrect_order_id".
+                    $ref: '#/components/schemas/ErrorReason'
+                message:
+                    description: Optional. Human-readable text in English.
+                    type: string
+                trace_id:
+                    description: Optional. ID to help investigate the problem.
+                    type: string
+
+        Localization:
+            description: 'Localization tag. Format: &lt;language code&gt;_&lt;country
+                alpha-2 code&gt;'
+            type: string
+            pattern: '^[a-z]{2}$'
+            example: 'en'
+            minLength: 2
+            maxLength: 2
+            default: 'en'

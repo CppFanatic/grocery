@@ -5,7 +5,8 @@ import {
   createOrder, 
   fetchOrderStatus, 
   updateOrderStatus,
-  fetchStores
+  fetchStores,
+  fetchGrids
 } from '../utils/api';
 
 /**
@@ -69,6 +70,11 @@ export const useApi = (baseUrl, authToken) => {
     return handleApiCall(fetchStores);
   }, [handleApiCall]);
 
+  const getGrids = useCallback((locale = 'en') => {
+    console.log('🎯 [useApi] Вызывается getGrids с локалью:', locale);
+    return handleApiCall(fetchGrids, locale);
+  }, [handleApiCall]);
+
   return {
     loading,
     error,
@@ -77,6 +83,7 @@ export const useApi = (baseUrl, authToken) => {
     submitOrder,
     getOrderStatus,
     updateOrder,
-    getStores
+    getStores,
+    getGrids
   };
 };

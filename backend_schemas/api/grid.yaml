@@ -1,0 +1,95 @@
+openapi: 3.0.0
+info:
+    description: Yandex Taxi grocery-api-layer-b2b-frontend Service
+    title: Yandex Taxi grocery-api-layer-b2b-frontend Service
+    version: '1.0'
+
+
+paths:
+    /b2b/v1/front/grids/get:
+        post:
+            summary: Get current grid
+            description: Get current grid
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/GridsGetRequest'
+            responses:
+                '200':
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/GridsGetResponse'
+                '404':
+                    description: Grid not found
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '../definitions.yaml#/components/schemas/ResponseBodyError'
+
+components:
+    schemas:
+        GridsGetRequest:
+            description: Grid request.
+            type: object
+            additionalProperties: false
+            properties:
+                locale:
+                    $ref: '../definitions.yaml#/components/schemas/Localization'
+
+        GridsGetResponse:
+            description: Grid response.
+            type: object
+            additionalProperties: false
+            required:
+              - id
+              - groups
+            properties:
+                id:
+                    description: Grid ID
+                    type: string
+                groups:
+                    description: Groups
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/Group'
+        Group:
+            description: Group
+            type: object
+            additionalProperties: false
+            required:
+              - id
+              - title
+              - categories
+            properties:
+                id:
+                    description: Group ID
+                    type: string
+                title:
+                    description: Group title
+                    type: string
+                categories:
+                    description: Categories
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/Category'
+        Category:
+            description: Category
+            type: object
+            additionalProperties: false
+            required:
+              - id
+              - title
+            properties:
+                id:
+                    description: Category ID
+                    type: string
+                title:
+                    description: Category title
+                    type: string
+                image_url:
+                    description: Image URL
+                    type: string
