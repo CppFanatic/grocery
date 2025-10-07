@@ -1,7 +1,5 @@
 openapi: 3.0.0
 info:
-    description: Yandex Taxi grocery-api-layer-b2b-frontend Service
-    title: Yandex Taxi grocery-api-layer-b2b-frontend Service
     version: '1.0'
 
 
