@@ -72,7 +72,7 @@ export const apiRequest = async (endpoint, baseUrl, authToken, options = {}) => 
     console.error('💥 [API] Error Message:', error.message);
     console.error('💥 [API] Error Stack:', error.stack);
     
-    // Обработка различных типов ошибок
+    // Обработка CORS ошибок
     if (error.message.includes('CORS') || error.message.includes('Access-Control-Allow-Origin')) {
       const corsError = new Error('CORS Error: Сервер не разрешает запросы с этого домена. Возможно, нужно настроить CORS на сервере или использовать прокси.');
       corsError.isCorsError = true;

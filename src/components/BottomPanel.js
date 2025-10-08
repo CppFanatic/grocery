@@ -159,10 +159,6 @@ function BottomPanel({
                   <p className="setting-description">
                     Укажите адрес API сервера для получения данных о продуктах и заказах
                   </p>
-                  <div className="cors-warning">
-                    <strong>⚠️ Внимание:</strong> При работе с реальным API может возникнуть ошибка CORS. 
-                    В этом случае используйте прокси или настройте CORS на сервере.
-                  </div>
               </div>
               
                 <div className="setting-item">
