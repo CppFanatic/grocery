@@ -116,7 +116,7 @@ function BottomPanel({
                   type="url"
                   value={apiUrl}
                   onChange={(e) => onApiUrlChange(e.target.value)}
-                  placeholder="http://localhost:3001"
+                  placeholder="http://localhost:3005"
                   className="api-url-input"
                 />
                   <p className="setting-description">

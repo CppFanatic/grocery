@@ -9,7 +9,7 @@ function App() {
   const [cart, setCart] = useState([]);
   const [orderStatus, setOrderStatus] = useState('Нет заказов');
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [apiUrl, setApiUrl] = useState('http://localhost:3001');
+  const [apiUrl, setApiUrl] = useState('http://localhost:3005');
   const [authToken, setAuthToken] = useState('');
   const [selectedStore, setSelectedStore] = useState(null);
   const [mainsData, setMainsData] = useState(null);
