@@ -62,7 +62,7 @@ components:
             properties:
                 next_page_token:
                     description: Page token
-                    type: string
+                    type: integer
                 products:
                     description: Products
                     type: array

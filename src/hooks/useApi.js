@@ -69,9 +69,9 @@ export const useApi = (baseUrl, authToken) => {
     return handleApiCall(fetchMains, locale);
   }, [handleApiCall]);
 
-  const getProductsList = useCallback((locale = 'en', categoryId, pageToken = '', limit = 10) => {
-    console.log('📦 [useApi] Вызывается getProductsList с параметрами:', { locale, categoryId, pageToken: pageToken || 'empty (first page)', limit });
-    return handleApiCall(fetchProductsList, locale, categoryId, pageToken, limit);
+  const getProductsList = useCallback((locale = 'en', categoryId, pageToken = null, limit = 10, storeId = null) => {
+    console.log('📦 [useApi] Вызывается getProductsList с параметрами:', { locale, categoryId, pageToken: pageToken || 'null (first page)', limit, storeId });
+    return handleApiCall(fetchProductsList, locale, categoryId, pageToken, limit, storeId);
   }, [handleApiCall]);
 
   return {

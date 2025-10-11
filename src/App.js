@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import MainView from './components/MainView';
+import CategoryView from './components/CategoryView';
 import BottomPanel from './components/BottomPanel';
 import StoreSelector from './components/StoreSelector';
 import { useApi } from './hooks/useApi';
@@ -15,6 +16,8 @@ function App() {
   const [mainsData, setMainsData] = useState(null);
   const [locale, setLocale] = useState('en');
   const [retryCount, setRetryCount] = useState(0);
+  const [currentView, setCurrentView] = useState('main'); // 'main' or 'category'
+  const [selectedCategory, setSelectedCategory] = useState(null);
 
   // Инициализируем API хук
   const api = useApi(apiUrl, authToken);
@@ -107,15 +110,22 @@ function App() {
 
 
   // Функция для загрузки продуктов из API с пагинацией
-  const loadProducts = useCallback(async (categoryId, pageToken = '', limit = 10) => {
+  const loadProducts = useCallback(async (categoryId, pageToken = null, limit = 10) => {
     try {
-      console.log('📦 [App] Загружаем продукты для категории:', categoryId, 'page token:', pageToken || 'empty (first page)', 'limit:', limit);
-      const response = await api.getProductsList(locale, categoryId, pageToken, limit);
+      console.log('📦 [App] Загружаем продукты для категории:', categoryId, 'page token:', pageToken || 'null (first page)', 'limit:', limit, 'store:', selectedStore?.id);
+      const response = await api.getProductsList(locale, categoryId, pageToken, limit, selectedStore?.id);
       
       // Согласно OpenAPI схеме, ответ содержит объект с полем products и next_page_token
       if (response && response.products && Array.isArray(response.products)) {
         const productsData = response.products;
-        const nextPageToken = response.next_page_token || null;
+        // Убеждаемся, что next_page_token является integer
+        const nextPageToken = response.next_page_token ? parseInt(response.next_page_token, 10) : null;
+        console.log('🔄 [App] next_page_token conversion:', {
+          original: response.next_page_token,
+          type: typeof response.next_page_token,
+          converted: nextPageToken,
+          convertedType: typeof nextPageToken
+        });
         console.log('✅ [App] Продукты загружены:', productsData.length, 'next_page_token:', nextPageToken);
         return { products: productsData, nextPageToken };
       } else {
@@ -183,7 +193,37 @@ function App() {
     // Сбрасываем данные при смене склада
     setMainsData(null);
     setRetryCount(0);
+    // Возвращаемся к главной странице
+    setCurrentView('main');
+    setSelectedCategory(null);
   }, []);
+
+  // Обработчик клика по категории
+  const handleCategoryClick = useCallback((category) => {
+    console.log('📂 [App] Клик по категории:', category);
+    setSelectedCategory(category);
+    setCurrentView('category');
+  }, []);
+
+  // Обработчик возврата к главной странице
+  const handleBackToMain = useCallback(() => {
+    console.log('🏠 [App] Возврат к главной странице');
+    setCurrentView('main');
+    setSelectedCategory(null);
+  }, []);
+
+  // Функция загрузки продуктов для категории
+  const loadCategoryProducts = useCallback(async (categoryId, pageToken = null, limit = 10) => {
+    console.log('📦 [App] Загружаем продукты для категории:', categoryId, 'Page token:', pageToken || 'null', 'Store:', selectedStore?.id);
+    try {
+      const response = await api.getProductsList(locale, categoryId, pageToken, limit, selectedStore?.id);
+      console.log('✅ [App] Продукты загружены:', response);
+      return response;
+    } catch (error) {
+      console.error('❌ [App] Ошибка загрузки продуктов:', error);
+      throw error;
+    }
+  }, [api, locale, selectedStore]);
 
   return (
     <div className="app">
@@ -200,22 +240,31 @@ function App() {
           useRealApi={true}
         />
         
-        {/* Используем MainView для отображения главной страницы с виджетами */}
-        <MainView 
-          mainsData={mainsData}
-          onAddToCart={addToCart}
-          onCategoryClick={(category) => {
-            console.log('📂 [App] Клик по категории:', category);
-            // Здесь можно добавить логику для перехода к категории
-          }}
-          onLoadProducts={loadProducts}
-          loading={api.loading}
-          error={api.error}
-          selectedStore={selectedStore}
-          useRealApi={true}
-          onRetry={handleRetry}
-          retryCount={retryCount}
-        />
+        {/* Условно рендерим MainView или CategoryView */}
+        {currentView === 'main' ? (
+          <MainView 
+            mainsData={mainsData}
+            onAddToCart={addToCart}
+            onCategoryClick={handleCategoryClick}
+            onLoadProducts={loadProducts}
+            loading={api.loading}
+            error={api.error}
+            selectedStore={selectedStore}
+            useRealApi={true}
+            onRetry={handleRetry}
+            retryCount={retryCount}
+          />
+        ) : (
+          <CategoryView
+            category={selectedCategory}
+            onAddToCart={addToCart}
+            onBack={handleBackToMain}
+            onLoadProducts={loadCategoryProducts}
+            loading={api.loading}
+            error={api.error}
+            locale={locale}
+          />
+        )}
       </main>
       
       <BottomPanel 

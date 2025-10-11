@@ -180,7 +180,7 @@ export const createOrder = async (baseUrl, authToken, orderData) => {
 export const fetchOrderStatus = async (baseUrl, authToken, orderId) => {
   return apiRequest('/orders/status', baseUrl, authToken, {
     method: 'POST',
-    body: JSON.stringify({ orderId })
+    body: JSON.stringify({ order_id: orderId })
   });
 };
 
@@ -195,7 +195,7 @@ export const fetchOrderStatus = async (baseUrl, authToken, orderId) => {
 export const updateOrderStatus = async (baseUrl, authToken, orderId, status) => {
   return apiRequest('/orders/update-status', baseUrl, authToken, {
     method: 'POST',
-    body: JSON.stringify({ orderId, status })
+    body: JSON.stringify({ order_id: orderId, status })
   });
 };
 
@@ -251,13 +251,13 @@ export const fetchMains = async (baseUrl, authToken, locale = 'en') => {
  * @param {string} authToken - Токен авторизации
  * @param {string} locale - Локаль для запроса (например, 'en', 'ru')
  * @param {string} categoryId - ID категории для фильтрации продуктов (обязательный параметр)
- * @param {string} pageToken - Токен страницы (пустая строка для первой страницы)
+ * @param {number|null} pageToken - Токен страницы (null для первой страницы)
  * @param {number} limit - Количество продуктов на странице (максимум 100)
  * @returns {Promise<Object>} - Promise с объектом содержащим массив products и next_page_token
  */
-export const fetchProductsList = async (baseUrl, authToken, locale = 'en', categoryId, pageToken = '', limit = 10) => {
+export const fetchProductsList = async (baseUrl, authToken, locale = 'en', categoryId, pageToken = null, limit = 10, storeId = null) => {
   console.log('📦 [fetchProductsList] Загружаем продукты для категории:', categoryId);
-  console.log('📦 [fetchProductsList] Page token:', pageToken || 'empty (first page)', 'Limit:', limit);
+  console.log('📦 [fetchProductsList] Page token:', pageToken || 'null (first page)', 'Limit:', limit, 'Store ID:', storeId);
   
   const requestBody = { 
     locale,
@@ -265,10 +265,22 @@ export const fetchProductsList = async (baseUrl, authToken, locale = 'en', categ
     limit: limit
   };
   
-  // Добавляем page_token только если он не пустой (не первая страница)
-  if (pageToken) {
+  // Добавляем store_id если он указан
+  if (storeId) {
+    requestBody.store_id = storeId;
+  }
+  
+  // Добавляем page_token только если он не null (не первая страница)
+  // Согласно схеме API, page_token должен быть integer
+  if (pageToken !== null) {
+    console.log('🔄 [fetchProductsList] page_token before sending:', {
+      value: pageToken,
+      type: typeof pageToken
+    });
     requestBody.page_token = pageToken;
   }
+
+  console.log('📦 [fetchProductsList] Request body:', requestBody);
 
   return apiRequest('/b2b/v1/front/products/list', baseUrl, authToken, {
     method: 'POST',
