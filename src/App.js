@@ -1,9 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import GridView from './components/GridView';
-import ProductGrid from './components/ProductGrid';
+import MainView from './components/MainView';
 import BottomPanel from './components/BottomPanel';
 import StoreSelector from './components/StoreSelector';
-import { categories, products } from './data/mockData';
 import { useApi } from './hooks/useApi';
 import './App.css';
 
@@ -13,13 +11,10 @@ function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [apiUrl, setApiUrl] = useState('http://localhost:3001');
   const [authToken, setAuthToken] = useState('');
-  const [useRealApi, setUseRealApi] = useState(false);
-  const [apiCategories, setApiCategories] = useState([]);
-  const [apiProducts, setApiProducts] = useState([]);
   const [selectedStore, setSelectedStore] = useState(null);
-  const [gridData, setGridData] = useState(null);
+  const [mainsData, setMainsData] = useState(null);
   const [locale, setLocale] = useState('en');
-  const [useGridView, setUseGridView] = useState(true);
+  const [retryCount, setRetryCount] = useState(0);
 
   // Инициализируем API хук
   const api = useApi(apiUrl, authToken);
@@ -62,40 +57,40 @@ function App() {
     return cart.reduce((total, item) => total + (item.price * item.quantity), 0);
   };
 
-  // Функция для загрузки грида из API
-  const loadGrid = useCallback(async () => {
-    if (!useRealApi || !useGridView || gridData) return;
+  // Функция для загрузки главной страницы из API
+  const loadMains = useCallback(async () => {
+    if (mainsData) return;
 
     try {
-      console.log('🎯 [App] Загружаем грид...');
-      console.log('🔍 [App] Параметры запроса:', { locale, apiUrl });
+      console.log('🏠 [App] Загружаем главную страницу...');
+      console.log('🔍 [App] Параметры запроса:', { locale, apiUrl, retryCount });
       
-      const response = await api.getGrids(locale);
+      const response = await api.getMains(locale);
       
-      // Согласно OpenAPI схеме, ответ содержит объект с полями id и groups
-      if (response && response.groups && Array.isArray(response.groups)) {
-        console.log('📊 [App] Получен грид:', response.id);
-        console.log('📊 [App] Групп в гриде:', response.groups.length);
+      // Согласно OpenAPI схеме, ответ содержит объект с полями id и widgets
+      if (response && response.widgets && Array.isArray(response.widgets)) {
+        console.log('📊 [App] Получена главная страница:', response.id);
+        console.log('📊 [App] Виджетов на странице:', response.widgets.length);
         console.log('📊 [App] Полный ответ API:', JSON.stringify(response, null, 2));
         
-        setGridData(response);
-        console.log('✅ [App] Грид установлен успешно');
+        setMainsData(response);
+        setRetryCount(0); // Сбрасываем счетчик при успешной загрузке
+        console.log('✅ [App] Главная страница установлена успешно');
       } else {
         console.warn('⚠️ [App] Неожиданный формат ответа API:', response);
-        console.warn('⚠️ [App] Ожидался объект с полем groups (массив)');
-        setGridData(null);
+        console.warn('⚠️ [App] Ожидался объект с полем widgets (массив)');
+        setMainsData(null);
       }
     } catch (error) {
-      console.error('❌ [App] Ошибка загрузки грида:');
+      console.error('❌ [App] Ошибка загрузки главной страницы:');
       console.error('❌ [App] Тип ошибки:', error.constructor.name);
       console.error('❌ [App] Сообщение ошибки:', error.message);
       console.error('❌ [App] Стек ошибки:', error.stack);
-      console.error('❌ [App] Параметры запроса:', { locale, apiUrl });
+      console.error('❌ [App] Параметры запроса:', { locale, apiUrl, retryCount });
       
       // Детальная обработка различных типов ошибок
       if (error.message.includes('404')) {
-        console.log('ℹ️ [App] Грид не найден (404), используем стандартный вид категорий');
-        setUseGridView(false);
+        console.log('ℹ️ [App] Главная страница не найдена (404)');
       } else if (error.message.includes('CORS')) {
         console.error('🚫 [App] CORS ошибка - проверьте настройки сервера');
       } else if (error.message.includes('Network')) {
@@ -106,80 +101,32 @@ function App() {
         console.error('🔥 [App] Внутренняя ошибка сервера');
       }
       
-      setGridData(null);
+      setMainsData(null);
     }
-  }, [useRealApi, useGridView, api, locale, apiUrl]);
+  }, [api, locale, apiUrl, mainsData, retryCount]);
 
-  // Функция для загрузки категорий из API (для не-grid режима)
-  const loadCategories = useCallback(async () => {
-    if (!useRealApi || useGridView || apiCategories.length > 0) return;
 
+  // Функция для загрузки продуктов из API с пагинацией
+  const loadProducts = useCallback(async (categoryId, pageToken = '', limit = 10) => {
     try {
-      console.log('📂 [App] Загружаем категории...');
-      const response = await api.getCategories();
+      console.log('📦 [App] Загружаем продукты для категории:', categoryId, 'page token:', pageToken || 'empty (first page)', 'limit:', limit);
+      const response = await api.getProductsList(locale, categoryId, pageToken, limit);
       
-      // Согласно OpenAPI схеме, ответ содержит объект с полем categories
-      if (response && response.categories && Array.isArray(response.categories)) {
-        console.log('📊 [App] Получено категорий от API:', response.categories.length);
-        
-        // Преобразуем данные API в формат, понятный нашему компоненту
-        const allCategories = response.categories.map(category => ({
-          id: category.id,
-          name: category.name?.ru || category.name?.en || `Категория ${category.id}`,
-          description: category.description?.ru || category.description?.en || '',
-          image: category.images && category.images.length > 0 ? category.images[0] : '/images/categories/default.svg',
-          parentId: category.parent_id || null,
-          order: category.order || 0,
-          status: category.status || 'active'
-        }));
-        
-        // Фильтруем только активные категории
-        const activeCategories = allCategories.filter(category => category.status === 'active');
-        
-        console.log('📊 [App] Активных категорий:', activeCategories.length);
-        console.log('📊 [App] Неактивных категорий:', allCategories.length - activeCategories.length);
-        
-        // Логируем неактивные категории для отладки
-        const inactiveCategories = allCategories.filter(category => category.status !== 'active');
-        if (inactiveCategories.length > 0) {
-          console.log('🚫 [App] Неактивные категории:', inactiveCategories.map(c => `${c.name} (${c.status})`));
-        }
-        
-        setApiCategories(activeCategories);
-        console.log('✅ [App] Активные категории установлены:', activeCategories.length);
+      // Согласно OpenAPI схеме, ответ содержит объект с полем products и next_page_token
+      if (response && response.products && Array.isArray(response.products)) {
+        const productsData = response.products;
+        const nextPageToken = response.next_page_token || null;
+        console.log('✅ [App] Продукты загружены:', productsData.length, 'next_page_token:', nextPageToken);
+        return { products: productsData, nextPageToken };
       } else {
-        console.warn('⚠️ [App] Неожиданный формат ответа API:', response);
-        setApiCategories([]);
+        console.warn('⚠️ [App] Неожиданный формат ответа API продуктов:', response);
+        return { products: [], nextPageToken: null };
       }
-    } catch (error) {
-      console.error('❌ [App] Ошибка загрузки категорий:', error);
-    }
-  }, [useRealApi, useGridView, api, apiCategories.length]);
-
-  // Функция для загрузки продуктов из API
-  const loadProducts = useCallback(async (categoryId = null) => {
-    if (!useRealApi) return;
-
-    try {
-      console.log('📦 [App] Загружаем продукты для категории:', categoryId || 'все');
-      const productsData = await api.getProducts(categoryId);
-      
-      if (categoryId) {
-        // Загружаем продукты для конкретной категории
-        setApiProducts(prevProducts => {
-          // Удаляем старые продукты этой категории и добавляем новые
-          const filteredProducts = prevProducts.filter(p => p.categoryId !== categoryId);
-          return [...filteredProducts, ...productsData];
-        });
-      } else {
-        // Загружаем все продукты
-        setApiProducts(productsData);
-      }
-      console.log('✅ [App] Продукты загружены:', productsData.length);
     } catch (error) {
       console.error('❌ [App] Ошибка загрузки продуктов:', error);
+      return { products: [], nextPageToken: null };
     }
-  }, [useRealApi, api]);
+  }, [api, locale]);
 
   // Функция для оформления заказа
   const handleCheckout = async () => {
@@ -201,53 +148,41 @@ function App() {
     };
 
     try {
-      if (useRealApi) {
-        const result = await api.submitOrder(orderData);
-        setOrderStatus('Заказ создан');
-        setCart([]);
-        console.log('Order created:', result);
-      } else {
-        // Симуляция создания заказа
-        setOrderStatus('Готовится');
-        setCart([]);
-        console.log('Mock order created:', orderData);
-      }
+      const result = await api.submitOrder(orderData);
+      setOrderStatus('Заказ создан');
+      setCart([]);
+      console.log('Order created:', result);
     } catch (error) {
       console.error('Failed to create order:', error);
+      setOrderStatus('Ошибка создания заказа');
     }
   };
 
-  // Загружаем грид или категории при изменении настроек API
+  // Загружаем главную страницу при изменении настроек API
   useEffect(() => {
-    if (useRealApi && apiUrl && selectedStore) {
-      if (useGridView) {
-        // Загружаем грид при выборе склада (только если еще не загружен)
-        if (!gridData) {
-          console.log('🔄 [App] useEffect: Запускаем загрузку грида');
-          loadGrid();
-        }
-      } else {
-        // Загружаем только категории при выборе склада
-        if (apiCategories.length === 0) {
-          console.log('🔄 [App] useEffect: Запускаем загрузку категорий');
-          loadCategories();
-        }
+    if (apiUrl && selectedStore) {
+      // Загружаем главную страницу при выборе склада (только если еще не загружена)
+      if (!mainsData) {
+        console.log('🔄 [App] useEffect: Запускаем загрузку главной страницы');
+        loadMains();
       }
     }
-  }, [useRealApi, apiUrl, selectedStore, useGridView, loadGrid, loadCategories, gridData, apiCategories.length]);
+  }, [apiUrl, selectedStore, loadMains, mainsData]);
 
-  // Получаем текущие данные (из API или моковые)
-  const currentCategories = useRealApi ? apiCategories : categories;
-  const currentProducts = useRealApi ? apiProducts : products;
+  // Функция для повторной попытки загрузки
+  const handleRetry = useCallback(() => {
+    console.log('🔄 [App] Пользователь запросил повторную попытку загрузки');
+    setMainsData(null);
+    setRetryCount(prev => prev + 1);
+  }, []);
 
   // Функция для выбора склада
   const handleStoreSelect = useCallback((store) => {
     console.log('🏪 [App] Выбран склад:', store);
     setSelectedStore(store);
     // Сбрасываем данные при смене склада
-    setGridData(null);
-    setApiCategories([]);
-    setApiProducts([]);
+    setMainsData(null);
+    setRetryCount(0);
   }, []);
 
   return (
@@ -263,33 +198,25 @@ function App() {
           onStoreSelect={handleStoreSelect}
           apiUrl={apiUrl}
           authToken={authToken}
-          useRealApi={useRealApi}
+          useRealApi={true}
         />
         
-        {/* Используем GridView когда включен режим грида, иначе ProductGrid */}
-        {useRealApi && useGridView ? (
-          <GridView 
-            gridData={gridData}
-            products={currentProducts}
-            onAddToCart={addToCart}
-            loading={api.loading}
-            error={api.error}
-            selectedStore={selectedStore}
-            useRealApi={useRealApi}
-            onLoadProducts={loadProducts}
-          />
-        ) : (
-          <ProductGrid 
-            categories={currentCategories}
-            products={currentProducts}
-            onAddToCart={addToCart}
-            loading={api.loading}
-            error={api.error}
-            selectedStore={selectedStore}
-            useRealApi={useRealApi}
-            onLoadProducts={loadProducts}
-          />
-        )}
+        {/* Используем MainView для отображения главной страницы с виджетами */}
+        <MainView 
+          mainsData={mainsData}
+          onAddToCart={addToCart}
+          onCategoryClick={(category) => {
+            console.log('📂 [App] Клик по категории:', category);
+            // Здесь можно добавить логику для перехода к категории
+          }}
+          onLoadProducts={loadProducts}
+          loading={api.loading}
+          error={api.error}
+          selectedStore={selectedStore}
+          useRealApi={true}
+          onRetry={handleRetry}
+          retryCount={retryCount}
+        />
       </main>
       
       <BottomPanel 
@@ -306,12 +233,8 @@ function App() {
         authToken={authToken}
         onAuthTokenChange={setAuthToken}
         onCheckout={handleCheckout}
-        useRealApi={useRealApi}
-        onToggleApi={setUseRealApi}
         locale={locale}
         onLocaleChange={setLocale}
-        useGridView={useGridView}
-        onToggleGridView={setUseGridView}
       />
     </div>
   );

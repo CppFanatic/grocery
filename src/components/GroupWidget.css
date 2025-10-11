@@ -1,0 +1,30 @@
+.group-widget {
+  margin-bottom: 2rem;
+}
+
+.group-widget__title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 1rem;
+  padding: 0 1rem;
+}
+
+.group-widget__categories {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 1rem;
+  padding: 0 1rem;
+}
+
+@media (max-width: 768px) {
+  .group-widget__categories {
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 0.75rem;
+  }
+  
+  .group-widget__title {
+    font-size: 1.25rem;
+    margin-bottom: 0.75rem;
+  }
+}

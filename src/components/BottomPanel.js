@@ -15,12 +15,8 @@ function BottomPanel({
   authToken,
   onAuthTokenChange,
   onCheckout,
-  useRealApi,
-  onToggleApi,
   locale,
-  onLocaleChange,
-  useGridView,
-  onToggleGridView
+  onLocaleChange
 }) {
   const [showCart, setShowCart] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
@@ -114,38 +110,6 @@ function BottomPanel({
             
             <div className="settings-body">
               <div className="setting-item">
-                <label className="checkbox-label">
-                  <input
-                    type="checkbox"
-                    checked={useRealApi}
-                    onChange={(e) => onToggleApi(e.target.checked)}
-                    className="api-toggle-checkbox"
-                  />
-                  <span className="checkbox-text">Использовать реальный API</span>
-                </label>
-                <p className="setting-description">
-                  Включите для работы с реальным API бекендом вместо моковых данных
-                </p>
-              </div>
-
-              {useRealApi && (
-                <div className="setting-item">
-                  <label className="checkbox-label">
-                    <input
-                      type="checkbox"
-                      checked={useGridView}
-                      onChange={(e) => onToggleGridView(e.target.checked)}
-                      className="api-toggle-checkbox"
-                    />
-                    <span className="checkbox-text">Использовать Grid View</span>
-                  </label>
-                  <p className="setting-description">
-                    Включите для использования API грида (группы и категории)
-                  </p>
-                </div>
-              )}
-              
-              <div className="setting-item">
                 <label htmlFor="apiUrl">URL API бекенда:</label>
                 <input
                   id="apiUrl"
@@ -154,7 +118,6 @@ function BottomPanel({
                   onChange={(e) => onApiUrlChange(e.target.value)}
                   placeholder="http://localhost:3001"
                   className="api-url-input"
-                  disabled={!useRealApi}
                 />
                   <p className="setting-description">
                     Укажите адрес API сервера для получения данных о продуктах и заказах
@@ -170,33 +133,30 @@ function BottomPanel({
                     onChange={(e) => onAuthTokenChange(e.target.value)}
                     placeholder="Введите токен авторизации"
                     className="auth-token-input"
-                    disabled={!useRealApi}
                   />
                   <p className="setting-description">
                     Токен для авторизации запросов к API (будет добавлен в заголовок Authorization)
                   </p>
                 </div>
 
-              {useRealApi && useGridView && (
-                <div className="setting-item">
-                  <label htmlFor="locale">Локаль:</label>
-                  <select
-                    id="locale"
-                    value={locale}
-                    onChange={(e) => onLocaleChange(e.target.value)}
-                    className="locale-select"
-                  >
-                    <option value="en">English (en)</option>
-                    <option value="ru">Русский (ru)</option>
-                    <option value="es">Español (es)</option>
-                    <option value="fr">Français (fr)</option>
-                    <option value="de">Deutsch (de)</option>
-                  </select>
-                  <p className="setting-description">
-                    Язык для запросов к Grid API (формат: двухбуквенный код языка)
-                  </p>
-                </div>
-              )}
+              <div className="setting-item">
+                <label htmlFor="locale">Локаль:</label>
+                <select
+                  id="locale"
+                  value={locale}
+                  onChange={(e) => onLocaleChange(e.target.value)}
+                  className="locale-select"
+                >
+                  <option value="en">English (en)</option>
+                  <option value="ru">Русский (ru)</option>
+                  <option value="es">Español (es)</option>
+                  <option value="fr">Français (fr)</option>
+                  <option value="de">Deutsch (de)</option>
+                </select>
+                <p className="setting-description">
+                  Язык для запросов к API (формат: двухбуквенный код языка)
+                </p>
+              </div>
 
             </div>
             

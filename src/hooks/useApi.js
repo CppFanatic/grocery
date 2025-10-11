@@ -6,7 +6,9 @@ import {
   fetchOrderStatus, 
   updateOrderStatus,
   fetchStores,
-  fetchGrids
+  fetchGrids,
+  fetchMains,
+  fetchProductsList
 } from '../utils/api';
 
 /**
@@ -75,6 +77,16 @@ export const useApi = (baseUrl, authToken) => {
     return handleApiCall(fetchGrids, locale);
   }, [handleApiCall]);
 
+  const getMains = useCallback((locale = 'en') => {
+    console.log('🏠 [useApi] Вызывается getMains с локалью:', locale);
+    return handleApiCall(fetchMains, locale);
+  }, [handleApiCall]);
+
+  const getProductsList = useCallback((locale = 'en', categoryId, pageToken = '', limit = 10) => {
+    console.log('📦 [useApi] Вызывается getProductsList с параметрами:', { locale, categoryId, pageToken: pageToken || 'empty (first page)', limit });
+    return handleApiCall(fetchProductsList, locale, categoryId, pageToken, limit);
+  }, [handleApiCall]);
+
   return {
     loading,
     error,
@@ -84,6 +96,8 @@ export const useApi = (baseUrl, authToken) => {
     getOrderStatus,
     updateOrder,
     getStores,
-    getGrids
+    getGrids,
+    getMains,
+    getProductsList
   };
 };

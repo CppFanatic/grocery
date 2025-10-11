@@ -1,0 +1,112 @@
+openapi: 3.0.0
+info:
+    version: '1.0'
+
+
+paths:
+    /b2b/v1/front/mains/get:
+        post:
+            summary: Get current main catalogue
+            description: Get current main catalogue
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/MainsGetRequest'
+            responses:
+                '200':
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/MainsGetResponse'
+                '404':
+                    description: Main not found
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '../definitions.yaml#/components/schemas/ResponseBodyError'
+
+components:
+    schemas:
+        MainsGetRequest:
+            description: Main request.
+            type: object
+            additionalProperties: false
+            properties:
+                locale:
+                    $ref: '../definitions.yaml#/components/schemas/Localization'
+
+        MainsGetResponse:
+            description: Main response.
+            type: object
+            additionalProperties: false
+            required:
+              - id
+              - widgets
+            properties:
+                id:
+                    description: Main ID
+                    type: string
+                widgets:
+                    description: Widgets
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/Widget'
+        Widget:
+            oneOf:
+              - $ref: '#/components/schemas/GroupWidget'
+              - $ref: '#/components/schemas/CarouselWidget'
+            discriminator:
+                propertyName: type
+                mapping:
+                    group: '#/components/schemas/GroupWidget'
+                    carousel: '#/components/schemas/CarouselWidget'
+
+        GroupWidget:
+            description: Group widget
+            type: object
+            additionalProperties: false
+            required:
+              - type
+              - id
+              - title
+              - categories
+            properties:
+                type:
+                    description: Widget type
+                    type: string
+                    enum:
+                      - group
+                id:
+                    description: Group ID
+                    type: string
+                title:
+                    description: Group title
+                    type: string
+                categories:
+                    description: Categories
+                    type: array
+                    items:
+                        $ref: '../definitions.yaml#/components/schemas/Category'
+        CarouselWidget:
+            description: Carousel widget
+            type: object
+            additionalProperties: false
+            required:
+              - type
+              - category_id
+              - title
+            properties:
+                type:
+                    description: Widget type
+                    type: string
+                    enum:
+                      - carousel
+                category_id:
+                    description: Category ID
+                    type: string
+                title:
+                    description: Title
+                    type: string

@@ -2,12 +2,11 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useApi } from '../hooks/useApi';
 import './StoreSelector.css';
 
-function StoreSelector({ selectedStore, onStoreSelect, apiUrl, authToken, useRealApi }) {
+function StoreSelector({ selectedStore, onStoreSelect, apiUrl, authToken }) {
   console.log('🏪 [StoreSelector] Компонент рендерится с пропсами:', {
     selectedStore: selectedStore ? selectedStore.name : 'не выбран',
     apiUrl,
-    authToken: authToken ? '***' : 'не указан',
-    useRealApi
+    authToken: authToken ? '***' : 'не указан'
   });
   
   // Дополнительное логирование для отладки
@@ -16,6 +15,7 @@ function StoreSelector({ selectedStore, onStoreSelect, apiUrl, authToken, useRea
     const [showStoreList, setShowStoreList] = useState(false);
     const [stores, setStores] = useState([]);
     const [error, setError] = useState(null);
+    const [isRequestInProgress, setIsRequestInProgress] = useState(false);
 
   const api = useApi(apiUrl, authToken);
 
@@ -41,7 +41,7 @@ function StoreSelector({ selectedStore, onStoreSelect, apiUrl, authToken, useRea
   // Загружаем список складов
   const loadStores = useCallback(async () => {
     // Проверяем, не идет ли уже загрузка
-    if (api.loading) {
+    if (api.loading || isRequestInProgress) {
       console.log('⏳ [StoreSelector] Загрузка уже идет, пропускаем...');
       return;
     }
@@ -52,42 +52,12 @@ function StoreSelector({ selectedStore, onStoreSelect, apiUrl, authToken, useRea
       return;
     }
     
-    console.log('🏪 [StoreSelector] Начинаем загрузку складов...');
-    console.log('🔧 [StoreSelector] Настройки:', { useRealApi, apiUrl, authToken: authToken ? '***' : 'не указан' });
+    // Устанавливаем флаг загрузки
+    setIsRequestInProgress(true);
     
-    if (!useRealApi) {
-      console.log('🎭 [StoreSelector] Используем моковые данные');
-      // Моковые данные для демонстрации
-      const mockStores = [
-        {
-          id: 'store_1',
-          name: 'Склад "Центральный"',
-          address: 'г. Москва, ул. Тверская, д. 1',
-          coordinates: { lat: 55.7558, lon: 37.6176 },
-          working_hours: '09:00-21:00',
-          phone: '+7 (495) 123-45-67'
-        },
-        {
-          id: 'store_2',
-          name: 'Склад "Северный"',
-          address: 'г. Москва, ул. Ленинградский проспект, д. 15',
-          coordinates: { lat: 55.7936, lon: 37.5500 },
-          working_hours: '08:00-22:00',
-          phone: '+7 (495) 234-56-78'
-        },
-        {
-          id: 'store_3',
-          name: 'Склад "Южный"',
-          address: 'г. Москва, ул. Варшавское шоссе, д. 42',
-          coordinates: { lat: 55.6221, lon: 37.6063 },
-          working_hours: '10:00-20:00',
-          phone: '+7 (495) 345-67-89'
-        }
-      ];
-      setStores(mockStores);
-      console.log('✅ [StoreSelector] Моковые данные загружены:', mockStores.length, 'складов');
-      return;
-    }
+    console.log('🏪 [StoreSelector] Начинаем загрузку складов...');
+    console.log('🔧 [StoreSelector] Настройки:', { apiUrl, authToken: authToken ? '***' : 'не указан' });
+    
 
     console.log('🌐 [StoreSelector] Загружаем данные из реального API...');
     setError(null);
@@ -98,45 +68,75 @@ function StoreSelector({ selectedStore, onStoreSelect, apiUrl, authToken, useRea
       
       // Согласно OpenAPI спецификации, ответ должен содержать поле stores
       if (data && data.stores && Array.isArray(data.stores)) {
+        console.log('📊 [StoreSelector] Получены данные складов:', data.stores.length, 'складов');
+        console.log('📊 [StoreSelector] Пример данных склада:', data.stores[0]);
+        
         // Преобразуем данные API в формат, понятный нашему компоненту
-        const formattedStores = data.stores.map(store => ({
-          id: store.id,
-          name: store.name || `Склад ${store.id}`,
-          address: store.address || 'Адрес не указан',
-          coordinates: store.location ? {
-            lat: store.location.lat,
-            lon: store.location.lon
-          } : null,
-          working_hours: store.store_schedule ? 
-            formatStoreSchedule(store.store_schedule) : 'Часы работы не указаны',
-          phone: store.phone || null,
-          status: store.status || 'unknown',
-          timezone: store.timezone || null
-        }));
+        const formattedStores = data.stores.map(store => {
+          // Проверяем обязательные поля согласно схеме
+          if (!store.id || !store.status || !store.location) {
+            console.warn('⚠️ [StoreSelector] Склад с неполными данными:', store);
+          }
+          
+          return {
+            id: store.id,
+            name: store.name || `Склад ${store.id}`,
+            address: store.address || 'Адрес не указан',
+            coordinates: store.location ? {
+              lat: store.location.lat,
+              lon: store.location.lon
+            } : null,
+            working_hours: store.store_schedule ? 
+              formatStoreSchedule(store.store_schedule) : 'Часы работы не указаны',
+            status: store.status || 'unknown',
+            timezone: store.timezone || null,
+            // Дополнительные поля из схемы
+            store_schedule: store.store_schedule || null
+          };
+        });
+        
         setStores(formattedStores);
         console.log('✅ [StoreSelector] Данные API успешно загружены:', formattedStores.length, 'складов');
         console.log('📊 [StoreSelector] Установлены склады:', formattedStores);
       } else {
         console.warn('⚠️ [StoreSelector] Неожиданный формат ответа API:', data);
+        console.warn('⚠️ [StoreSelector] Ожидался объект с полем stores (массив)');
         setStores([]);
       }
     } catch (err) {
       console.error('❌ [StoreSelector] Ошибка загрузки складов:', err);
+      console.error('❌ [StoreSelector] Тип ошибки:', err.constructor.name);
+      console.error('❌ [StoreSelector] Сообщение ошибки:', err.message);
       
-      // Специальная обработка CORS ошибок
-      if (err.isCorsError || err.message.includes('CORS')) {
-        setError('Ошибка CORS: Сервер не разрешает запросы с локального домена. Попробуйте использовать прокси или настройте CORS на сервере.');
+      // Детальная обработка различных типов ошибок
+      let errorMessage = 'Ошибка загрузки складов';
+      
+      if (err.isTimeoutError || err.message.includes('превысил время ожидания')) {
+        errorMessage = 'Запрос превысил время ожидания (30 секунд). Сервер может быть недоступен или медленно отвечает. Попробуйте еще раз.';
+      } else if (err.isCorsError || err.message.includes('CORS')) {
+        errorMessage = 'Ошибка CORS: Сервер не разрешает запросы с локального домена. Попробуйте использовать прокси или настройте CORS на сервере.';
+      } else if (err.message.includes('404')) {
+        errorMessage = 'Склады не найдены (404). Проверьте правильность API endpoint.';
+      } else if (err.message.includes('401') || err.message.includes('403')) {
+        errorMessage = 'Ошибка авторизации: проверьте токен авторизации.';
+      } else if (err.message.includes('Network') || err.message.includes('Failed to fetch')) {
+        errorMessage = 'Сетевая ошибка: не удается подключиться к серверу. Проверьте URL и доступность сервера.';
+      } else if (err.message.includes('500')) {
+        errorMessage = 'Внутренняя ошибка сервера (500).';
       } else {
-        setError(err.message);
+        errorMessage = err.message || 'Неизвестная ошибка при загрузке складов';
       }
+      
+      setError(errorMessage);
       
       // В случае ошибки оставляем список складов пустым
       console.log('🔄 [StoreSelector] Список складов остается пустым из-за ошибки');
       setStores([]);
     } finally {
       console.log('🏁 [StoreSelector] Загрузка завершена');
+      setIsRequestInProgress(false);
     }
-  }, [useRealApi, apiUrl, authToken, api.loading, error, stores.length]);
+  }, [apiUrl, authToken, api.loading, error, stores.length, isRequestInProgress]);
 
   // Очищаем список складов и выбранный склад при изменении настроек API
   useEffect(() => {
@@ -148,16 +148,22 @@ function StoreSelector({ selectedStore, onStoreSelect, apiUrl, authToken, useRea
       console.log('🗑️ [StoreSelector] Сбрасываем выбранный склад:', selectedStore.name);
       onStoreSelect(null);
     }
-  }, [useRealApi, apiUrl, authToken]); // Убрали selectedStore и onStoreSelect из зависимостей
+  }, [apiUrl, authToken]); // Убрали selectedStore и onStoreSelect из зависимостей
 
   // Загружаем склады только при первом открытии списка (если нет ошибки)
   useEffect(() => {
-    console.log('🔍 [StoreSelector] useEffect triggered:', { showStoreList, storesLength: stores.length, loading: api.loading, hasError: !!error });
-    if (showStoreList && stores.length === 0 && !api.loading && !error) {
+    console.log('🔍 [StoreSelector] useEffect triggered:', { 
+      showStoreList, 
+      storesLength: stores.length, 
+      loading: api.loading, 
+      hasError: !!error,
+      isRequestInProgress 
+    });
+    if (showStoreList && stores.length === 0 && !api.loading && !error && !isRequestInProgress) {
       console.log('📂 [StoreSelector] Открыто модальное окно, загружаем склады');
       loadStores();
     }
-  }, [showStoreList, stores.length, loadStores, api.loading, error]);
+  }, [showStoreList, stores.length, loadStores, api.loading, error, isRequestInProgress]);
 
   const handleStoreSelect = (store) => {
     onStoreSelect(store);
@@ -209,10 +215,13 @@ function StoreSelector({ selectedStore, onStoreSelect, apiUrl, authToken, useRea
             </div>
             
             <div className="store-list-body">
-              {api.loading && (
+              {(api.loading || isRequestInProgress) && (
                 <div className="loading-state">
                   <div className="loading-spinner"></div>
                   <p>Загрузка складов...</p>
+                  {isRequestInProgress && (
+                    <p className="loading-timeout-info">Максимальное время ожидания: 30 секунд</p>
+                  )}
                 </div>
               )}
               
@@ -225,11 +234,12 @@ function StoreSelector({ selectedStore, onStoreSelect, apiUrl, authToken, useRea
                     onClick={() => {
                       console.log('🔄 [StoreSelector] Повторная попытка загрузки складов');
                       setError(null);
+                      setIsRequestInProgress(false);
                       loadStores();
                     }}
-                    disabled={api.loading}
+                    disabled={api.loading || isRequestInProgress}
                   >
-                    {api.loading ? 'Загрузка...' : 'Повторить попытку'}
+                    {(api.loading || isRequestInProgress) ? 'Загрузка...' : 'Повторить попытку'}
                   </button>
                 </div>
               )}

@@ -9,10 +9,10 @@ function ProductCard({ product, onAddToCart }) {
   return (
     <div className="product-card">
       <div className="product-image">
-        <img src={product.image} alt={product.name} />
+        <img src={product.image_url} alt={product.title} />
       </div>
       <div className="product-info">
-        <h3 className="product-name">{product.name}</h3>
+        <h3 className="product-name">{product.title}</h3>
         <p className="product-description">{product.description}</p>
         <div className="product-footer">
           <span className="product-price">{product.price} ₽</span>

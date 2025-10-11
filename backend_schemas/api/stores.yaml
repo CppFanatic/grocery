@@ -1,0 +1,155 @@
+openapi: '3.0.0'
+info:
+    version: '1.0'
+
+
+paths:
+    /b2b/v1/stores/get:
+        post:
+            summary: Get all stores
+            description: Shows detailed stores' information.
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: '../definitions.yaml#/components/schemas/EmptyRequest'
+            responses:
+                '200':
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/GetStoresResponse'
+
+components:
+    schemas:
+        GetStoresResponse:
+            type: object
+            additionalProperties: false
+            required:
+              - stores
+            properties:
+                stores:
+                    description: List of stores.
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/StoreInfo'
+
+        StoreInfo:
+            description: Information about a store.
+            type: object
+            additionalProperties: false
+            required:
+              - id
+              - status
+              - location
+            properties:
+                id:
+                    $ref: '../definitions.yaml#/components/schemas/StoreId'
+                name:
+                    $ref: '../definitions.yaml#/components/schemas/StoreName'
+                status:
+                    description: Store status.
+                    $ref: '#/components/schemas/StoreStatus'
+                location:
+                    description: Store location
+                    $ref: '../definitions.yaml#/components/schemas/Point'
+                address:
+                    description: Store address
+                    type: string
+                timezone:
+                    description: Store timezone
+                    $ref: '../definitions.yaml#/components/schemas/TimeZone'
+                store_schedule:
+                    description: >
+                        Store schedule is a collection of rules, that can apply to
+                        a day. 
+
+                        Priority of rules:
+
+                            holiday
+                            specific day of the week (monday, tuesday, etc.)
+                            weekend
+                            workday
+                            everyday
+                            
+                        For this set of rules:
+
+                            [   
+                                {
+                                    "type": "monday",
+                                    "open_time": "03:00",
+                                    "close_time": "22:30"
+                                },
+                                {
+                                    "type": "holiday",
+                                    "open_time": "11:30",
+                                    "close_time": "22:30"
+                                },
+                                {
+                                    "type":"everyday",
+                                    "open_time":"00:00",
+                                    "close_time":"07:45"
+                                }
+                            ]
+
+                        Schedule for every day of the week whould look like this:
+
+                            Monday — from 03:00 to 22:30.
+                            Monday (if holiday) — from 11:30 to 22:30.
+                            Tuesday (if holiday) — from 11:30 to 22:30.
+                            Wednesday — from 00:00 to 07:45.
+                            Thursday — from 00:00 to 07:45.
+                            Friday — from 00:00 to 07:45.
+                            Saturday — from 00:00 to 07:45.
+                            Sunday — from 00:00 to 07:45.
+
+                    type: array
+                    minItems: 1
+                    items:
+                        $ref: '#/components/schemas/StoreScheduleItem'
+
+        StoreStatus:
+            description: Store status.
+            type: string
+            enum:
+              - disabled
+              - active
+              - closed
+
+        StoreScheduleItem:
+            type: object
+            additionalProperties: false
+            required:
+              - type
+              - open_time
+              - close_time
+            properties:
+                type:
+                    description: Store schedule item type.
+                    $ref: '#/components/schemas/StoreScheduleItemType'
+                open_time:
+                    description: The time when the store is opened.
+                    $ref: '../definitions.yaml#/components/schemas/Time'
+                close_time:
+                    description: The time when the store is closed.
+                    $ref: '../definitions.yaml#/components/schemas/Time'
+
+        StoreScheduleItemType:
+            description: >
+                Store schedule item type.  Priority schedule item
+            type: string
+            enum:
+              - everyday
+              - workday
+              - weekend
+              - holiday
+              - monday
+              - tuesday
+              - wednesday
+              - thursday
+              - friday
+              - saturday
+              - sunday
+            example: tuesday

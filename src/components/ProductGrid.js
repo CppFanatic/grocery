@@ -8,7 +8,7 @@ function ProductGrid({ categories, products, onAddToCart, loading, error, select
   const [showCategories, setShowCategories] = useState(true);
 
   const handleCategorySelect = (category) => {
-    console.log('📂 [ProductGrid] Выбрана категория:', category.name, 'ID:', category.id);
+    console.log('📂 [ProductGrid] Выбрана категория:', category.title, 'ID:', category.id);
     setSelectedCategory(category);
     setShowCategories(false);
     
@@ -87,7 +87,7 @@ function ProductGrid({ categories, products, onAddToCart, loading, error, select
             <button className="back-button" onClick={handleBackToCategories}>
               ← Назад к категориям
             </button>
-            <h2>{selectedCategory.name}</h2>
+            <h2>{selectedCategory.title}</h2>
           </div>
           <div className="products-grid">
             {loading && filteredProducts.length === 0 ? (

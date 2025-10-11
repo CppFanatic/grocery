@@ -53,3 +53,78 @@ components:
             minLength: 2
             maxLength: 2
             default: 'en'
+
+        Category:
+            description: Category
+            type: object
+            additionalProperties: false
+            required:
+              - id
+              - title
+            properties:
+                id:
+                    description: Category ID
+                    type: string
+                title:
+                    description: Category title
+                    type: string
+                image_url:
+                    description: Image URL
+                    type: string
+
+        StoreId:
+            description: A unique identifier for the store.
+            type: string
+            minLength: 1
+            maxLength: 255
+            example: '12345678-abcd-efgh-ijkl-1234567890ab'
+
+        StoreName:
+            description: Store name.
+            type: string
+            minLength: 6
+            maxLength: 1024
+            example: 'Store 1'
+
+        StoreType:
+            description: Store type.
+            type: string
+            enum:
+              - darkstore
+              - retail_store
+              - distribution_center
+
+        TimeZone:
+            description: Time zone.
+            type: string
+            example: Europe/Paris
+
+        Point:
+            type: object
+            additionalProperties: false
+            x-taxi-cpp-type: geometry::PositionAsObject
+            required:
+              - lat
+              - lon
+            properties:
+                lat:
+                    description: Latitude
+                    type: number
+                    minimum: -90
+                    maximum: 90
+                lon:
+                    description: Longitude
+                    type: number
+                    minimum: -180
+                    maximum: 180
+
+        Time:
+            type: string
+            pattern: '^\d{2}:\d{2}$'
+            example: "07:00"
+
+        Numeric:
+            type: string
+            pattern: '^\d+(\.\d*)?$'
+            description: Basically Decimal<4>
+            example: "56.1234"
