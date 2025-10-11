@@ -154,33 +154,7 @@ export const apiRequest = async (endpoint, baseUrl, authToken, options = {}) => 
   }
 };
 
-/**
- * Получает список категорий через OpenAPI схему
- * @param {string} baseUrl - Базовый URL API
- * @param {string} authToken - Токен авторизации
- * @returns {Promise<Object>} - Promise с объектом содержащим массив categories
- */
-export const fetchCategories = async (baseUrl, authToken) => {
-  return apiRequest('/b2b/v1/front-categories/get', baseUrl, authToken, {
-    method: 'POST',
-    body: JSON.stringify({}) // Пустой объект согласно OpenAPI спецификации
-  });
-};
 
-/**
- * Получает список продуктов
- * @param {string} baseUrl - Базовый URL API
- * @param {string} authToken - Токен авторизации
- * @param {number} categoryId - ID категории (опционально)
- * @returns {Promise<Array>} - Promise с массивом продуктов
- */
-export const fetchProducts = async (baseUrl, authToken, categoryId = null) => {
-  const requestBody = categoryId ? { categoryId } : {};
-  return apiRequest('/products', baseUrl, authToken, {
-    method: 'POST',
-    body: JSON.stringify(requestBody)
-  });
-};
 
 /**
  * Создает новый заказ

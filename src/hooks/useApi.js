@@ -1,7 +1,5 @@
 import { useState, useCallback } from 'react';
 import { 
-  fetchCategories, 
-  fetchProducts, 
   createOrder, 
   fetchOrderStatus, 
   updateOrderStatus,
@@ -46,13 +44,7 @@ export const useApi = (baseUrl, authToken) => {
     }
   }, [baseUrl, authToken]);
 
-  const getCategories = useCallback(() => {
-    return handleApiCall(fetchCategories);
-  }, [handleApiCall]);
 
-  const getProducts = useCallback((categoryId = null) => {
-    return handleApiCall(fetchProducts, categoryId);
-  }, [handleApiCall]);
 
   const submitOrder = useCallback((orderData) => {
     return handleApiCall(createOrder, orderData);
@@ -85,8 +77,6 @@ export const useApi = (baseUrl, authToken) => {
   return {
     loading,
     error,
-    getCategories,
-    getProducts,
     submitOrder,
     getOrderStatus,
     updateOrder,

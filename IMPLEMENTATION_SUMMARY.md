@@ -9,7 +9,6 @@ Successfully implemented main application functionality with API integration for
 **File: `src/utils/api.js`**
 - Added API functions for:
   - Store management (`fetchStores`)
-  - Category management (`fetchCategories`)
   - Product management (`fetchProductsList`)
   - Main page widgets (`fetchMains`)
   - Order management (`createOrder`, `fetchOrderStatus`, `updateOrderStatus`)
