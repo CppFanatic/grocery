@@ -256,19 +256,6 @@ export const fetchStores = async (baseUrl, authToken) => {
   }
 };
 
-/**
- * Получает грид (сетку групп и категорий) через OpenAPI схему
- * @param {string} baseUrl - Базовый URL API
- * @param {string} authToken - Токен авторизации
- * @param {string} locale - Локаль для запроса (например, 'en', 'ru')
- * @returns {Promise<Object>} - Promise с объектом содержащим id и groups
- */
-export const fetchGrids = async (baseUrl, authToken, locale = 'en') => {
-  return apiRequest('/b2b/v1/front/grids/get', baseUrl, authToken, {
-    method: 'POST',
-    body: JSON.stringify({ locale }) // Локаль согласно OpenAPI спецификации
-  });
-};
 
 /**
  * Получает главную страницу с виджетами через OpenAPI схему

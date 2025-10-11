@@ -7,7 +7,7 @@ A Progressive Web App for browsing and ordering grocery products.
 - 📱 Progressive Web App (PWA) with offline support
 - 🏪 Store selection
 - 📦 Product browsing by categories
-- 🎯 **Grid View** - Advanced product organization with groups and categories
+- 🎯 **Main Page Widgets** - Dynamic content organization with widgets
 - 🛒 Shopping cart functionality
 - 💾 Local storage persistence
 - 📱 Mobile-friendly responsive design
@@ -89,13 +89,13 @@ frontdemo1/
 └── dist/              # Production build
 ```
 
-## Grid API
+## API Integration
 
-The app supports a grid-based view for organizing products into groups and categories. See [GRID_API.md](./GRID_API.md) for detailed documentation on:
-- Grid API endpoint structure
-- Required headers (X-Company-ID, X-Merchant-Name)
-- Response format
-- Configuration and usage
+The app integrates with backend APIs for:
+- Store management
+- Product categories and listings
+- Main page widgets
+- Order management
 
 ## Technologies
 
