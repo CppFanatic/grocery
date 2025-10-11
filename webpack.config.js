@@ -43,10 +43,6 @@ module.exports = {
           to: 'sw.js'
         },
         {
-          from: 'public/images',
-          to: 'images'
-        },
-        {
           from: 'public/*.svg',
           to: '[name][ext]'
         }
