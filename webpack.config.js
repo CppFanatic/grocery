@@ -30,7 +30,7 @@ module.exports = {
   plugins: [
     new HtmlWebpackPlugin({
       template: './public/index.html',
-      title: 'Delivery PWA'
+      title: 'Frontend API Demo App'
     }),
     new CopyWebpackPlugin({
       patterns: [

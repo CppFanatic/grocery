@@ -188,8 +188,7 @@ function App() {
   return (
     <div className="app">
       <header className="app-header">
-        <h1>🍕 Delivery PWA</h1>
-        <p>Заказ еды с доставкой</p>
+        <h1>🍕 Delicious API</h1>
       </header>
       
       <main className="app-main">

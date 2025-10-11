@@ -1,7 +1,7 @@
 {
-  "name": "Delivery PWA",
+  "name": "Frontend API Demo App",
   "short_name": "Delivery",
-  "description": "Приложение для заказа еды с доставкой",
+  "description": "Frontend API Demo App",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
