@@ -143,12 +143,11 @@ const MainView = ({
 
   return (
     <div className="main-view">
-      <div className="main-view__header">
-        <h1>Главная страница</h1>
-        {mainsData.id && (
+      {mainsData.id && (
+        <div className="main-view__header">
           <p className="main-view__id">ID: {mainsData.id}</p>
-        )}
-      </div>
+        </div>
+      )}
       
       <div className="main-view__widgets">
         {mainsData.widgets.map((widget, index) => {

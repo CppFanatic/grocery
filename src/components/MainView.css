@@ -2,13 +2,16 @@
   padding: 1rem;
   max-width: 1200px;
   margin: 0 auto;
+  background: rgba(255, 248, 220, 0.8);
+  border-radius: 15px;
+  box-shadow: 0 8px 32px rgba(139, 69, 19, 0.2);
+  backdrop-filter: blur(10px);
 }
 
 .main-view__header {
   text-align: center;
   margin-bottom: 2rem;
   padding-bottom: 1rem;
-  border-bottom: 2px solid #f0f0f0;
 }
 
 .main-view__header h1 {
@@ -20,9 +23,10 @@
 
 .main-view__id {
   font-size: 0.9rem;
-  color: #666;
+  color: #8B4513;
   margin: 0;
-  font-family: monospace;
+  font-family: 'Georgia', 'Times New Roman', serif;
+  font-weight: 600;
 }
 
 .main-view__widgets {

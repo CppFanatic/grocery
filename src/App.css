@@ -1,27 +1,31 @@
-/* Основные стили приложения */
+/* Основные стили приложения - Итальянская кухня */
 .app {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #8B4513 0%, #D2691E 25%, #CD853F 50%, #F4A460 75%, #DEB887 100%);
+  font-family: 'Georgia', 'Times New Roman', serif;
 }
 
 .app-header {
-  background: rgba(255, 255, 255, 0.95);
+  background: linear-gradient(135deg, #FFF8DC 0%, #F5DEB3 100%);
   backdrop-filter: blur(10px);
   padding: 5px 0;
   text-align: center;
-  box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 20px rgba(139, 69, 19, 0.3);
   position: sticky;
   top: 0;
   z-index: 100;
+  border-bottom: 3px solid #8B4513;
 }
 
 .app-header h1 {
   font-size: 2.5rem;
-  color: #FF9800;
+  color: #8B4513;
   margin-bottom: 8px;
   font-weight: 700;
+  text-shadow: 2px 2px 4px rgba(255, 255, 255, 0.8);
+  font-family: 'Georgia', 'Times New Roman', serif;
 }
 
 .app-header p {
@@ -34,6 +38,8 @@
   flex: 1;
   padding: 20px 0;
   margin-bottom: 100px; /* Отступ для нижней панели */
+  background: rgba(255, 248, 220, 0.1);
+  backdrop-filter: blur(5px);
 }
 
 /* Адаптивность */

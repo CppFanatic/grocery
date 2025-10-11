@@ -1,14 +1,14 @@
-/* Стили для выбора склада */
+/* Стили для выбора склада - Итальянская кухня */
 .store-selector {
-  background: white;
+  background: linear-gradient(135deg, #FFF8DC 0%, #F5DEB3 100%);
   border-radius: 12px;
   padding: 16px 20px;
   margin: 0 16px 20px 16px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 20px rgba(139, 69, 19, 0.2);
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border: 1px solid #e0e0e0;
+  border: 2px solid #D2691E;
 }
 
 .store-info {
@@ -19,18 +19,20 @@
 .store-name {
   font-size: 1.1rem;
   font-weight: 600;
-  color: #333;
+  color: #8B4513;
   margin-bottom: 4px;
+  font-family: 'Georgia', 'Times New Roman', serif;
 }
 
 .store-address {
   font-size: 0.9rem;
-  color: #666;
+  color: #8B4513;
   line-height: 1.4;
+  font-family: 'Georgia', 'Times New Roman', serif;
 }
 
 .select-store-btn {
-  background: linear-gradient(135deg, #2196F3, #1976D2);
+  background: linear-gradient(135deg, #8B4513, #D2691E);
   color: white;
   border: none;
   padding: 10px 20px;
@@ -40,13 +42,14 @@
   font-weight: 600;
   transition: all 0.3s ease;
   white-space: nowrap;
-  box-shadow: 0 2px 8px rgba(33, 150, 243, 0.3);
+  box-shadow: 0 2px 8px rgba(139, 69, 19, 0.3);
+  font-family: 'Georgia', 'Times New Roman', serif;
 }
 
 .select-store-btn:hover {
-  background: linear-gradient(135deg, #1976D2, #1565C0);
+  background: linear-gradient(135deg, #D2691E, #CD853F);
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(33, 150, 243, 0.4);
+  box-shadow: 0 4px 12px rgba(139, 69, 19, 0.4);
 }
 
 .select-store-btn:active {
@@ -69,7 +72,7 @@
 }
 
 .store-list-content {
-  background: white;
+  background: linear-gradient(135deg, #FFF8DC 0%, #F5DEB3 100%);
   width: 90%;
   max-width: 600px;
   max-height: 80vh;
@@ -77,6 +80,8 @@
   display: flex;
   flex-direction: column;
   animation: slideUp 0.3s ease-out;
+  border: 2px solid #D2691E;
+  box-shadow: 0 8px 32px rgba(139, 69, 19, 0.3);
 }
 
 .store-list-header {
@@ -89,8 +94,9 @@
 
 .store-list-header h2 {
   font-size: 1.5rem;
-  color: #333;
+  color: #8B4513;
   margin: 0;
+  font-family: 'Georgia', 'Times New Roman', serif;
 }
 
 .close-btn {
@@ -98,7 +104,7 @@
   border: none;
   font-size: 24px;
   cursor: pointer;
-  color: #666;
+  color: #8B4513;
   padding: 0;
   width: 30px;
   height: 30px;
@@ -110,8 +116,8 @@
 }
 
 .close-btn:hover {
-  background: #f5f5f5;
-  color: #333;
+  background: rgba(139, 69, 19, 0.1);
+  color: #8B4513;
 }
 
 .store-list-body {
@@ -197,24 +203,24 @@
 }
 
 .store-item {
-  border: 2px solid #e0e0e0;
+  border: 2px solid #D2691E;
   border-radius: 12px;
   padding: 16px;
   margin-bottom: 12px;
   cursor: pointer;
   transition: all 0.3s ease;
-  background: white;
+  background: linear-gradient(135deg, #FFF8DC 0%, #F5DEB3 100%);
 }
 
 .store-item:hover {
-  border-color: #2196F3;
-  box-shadow: 0 4px 12px rgba(33, 150, 243, 0.1);
+  border-color: #8B4513;
+  box-shadow: 0 4px 12px rgba(139, 69, 19, 0.2);
   transform: translateY(-2px);
 }
 
 .store-item.selected {
-  border-color: #2196F3;
-  background: #f3f8ff;
+  border-color: #8B4513;
+  background: linear-gradient(135deg, #F5DEB3 0%, #DEB887 100%);
 }
 
 .store-item-header {
@@ -227,28 +233,31 @@
 .store-item-name {
   font-size: 1.1rem;
   font-weight: 600;
-  color: #333;
+  color: #8B4513;
   margin: 0;
+  font-family: 'Georgia', 'Times New Roman', serif;
 }
 
 .selected-indicator {
-  color: #2196F3;
+  color: #8B4513;
   font-size: 1.2rem;
   font-weight: bold;
 }
 
 .store-item-address {
   font-size: 0.9rem;
-  color: #666;
+  color: #8B4513;
   margin-bottom: 6px;
   line-height: 1.4;
+  font-family: 'Georgia', 'Times New Roman', serif;
 }
 
 .store-item-hours,
 .store-item-phone {
   font-size: 0.85rem;
-  color: #888;
+  color: #8B4513;
   margin-bottom: 4px;
+  font-family: 'Georgia', 'Times New Roman', serif;
 }
 
 .store-item-phone:last-child {

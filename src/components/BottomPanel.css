@@ -1,18 +1,18 @@
-/* Стили для нижней панели */
+/* Стили для нижней панели - Итальянская кухня */
 .bottom-panel {
   position: fixed;
   bottom: 0;
   left: 0;
   right: 0;
-  background: rgba(255, 255, 255, 0.95);
+  background: linear-gradient(135deg, #FFF8DC 0%, #F5DEB3 100%);
   backdrop-filter: blur(20px);
-  border-top: 1px solid rgba(0, 0, 0, 0.1);
+  border-top: 3px solid #8B4513;
   padding: 16px;
   display: flex;
   justify-content: space-around;
   align-items: center;
   z-index: 1000;
-  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 -4px 20px rgba(139, 69, 19, 0.3);
 }
 
 .panel-item {
@@ -28,7 +28,7 @@
 }
 
 .panel-item:hover {
-  background: rgba(33, 150, 243, 0.1);
+  background: rgba(139, 69, 19, 0.1);
   transform: translateY(-2px);
 }
 
@@ -40,8 +40,9 @@
 .panel-item .label {
   font-size: 12px;
   font-weight: 500;
-  color: #666;
+  color: #8B4513;
   text-align: center;
+  font-family: 'Georgia', 'Times New Roman', serif;
 }
 
 .panel-item.order-status {
@@ -227,7 +228,7 @@
 
 .checkout-btn {
   width: 100%;
-  background: linear-gradient(135deg, #2196F3, #1976D2);
+  background: linear-gradient(135deg, #8B4513, #D2691E);
   color: white;
   border: none;
   padding: 16px;
@@ -236,13 +237,14 @@
   font-size: 16px;
   font-weight: 600;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 12px rgba(33, 150, 243, 0.3);
+  box-shadow: 0 4px 12px rgba(139, 69, 19, 0.3);
+  font-family: 'Georgia', 'Times New Roman', serif;
 }
 
 .checkout-btn:hover {
-  background: linear-gradient(135deg, #1976D2, #1565C0);
+  background: linear-gradient(135deg, #D2691E, #CD853F);
   transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(33, 150, 243, 0.4);
+  box-shadow: 0 6px 16px rgba(139, 69, 19, 0.4);
 }
 
 /* Анимации */
@@ -403,7 +405,7 @@
 
 .save-btn {
   width: 100%;
-  background: linear-gradient(135deg, #2196F3, #1976D2);
+  background: linear-gradient(135deg, #8B4513, #D2691E);
   color: white;
   border: none;
   padding: 16px;
@@ -412,13 +414,14 @@
   font-size: 16px;
   font-weight: 600;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 12px rgba(33, 150, 243, 0.3);
+  box-shadow: 0 4px 12px rgba(139, 69, 19, 0.3);
+  font-family: 'Georgia', 'Times New Roman', serif;
 }
 
 .save-btn:hover {
-  background: linear-gradient(135deg, #1976D2, #1565C0);
+  background: linear-gradient(135deg, #D2691E, #CD853F);
   transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(33, 150, 243, 0.4);
+  box-shadow: 0 6px 16px rgba(139, 69, 19, 0.4);
 }
 
 /* Адаптивность */
