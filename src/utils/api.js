@@ -251,7 +251,7 @@ export const fetchMains = async (baseUrl, authToken, locale = 'en') => {
  * @param {string} authToken - Токен авторизации
  * @param {string} locale - Локаль для запроса (например, 'en', 'ru')
  * @param {string} categoryId - ID категории для фильтрации продуктов (обязательный параметр)
- * @param {number|null} pageToken - Токен страницы (null для первой страницы)
+ * @param {string|null} pageToken - Токен страницы (null для первой страницы, может быть опущен)
  * @param {number} limit - Количество продуктов на странице (максимум 100)
  * @returns {Promise<Object>} - Promise с объектом содержащим массив products и next_page_token
  */
@@ -271,7 +271,7 @@ export const fetchProductsList = async (baseUrl, authToken, locale = 'en', categ
   }
   
   // Добавляем page_token только если он не null (не первая страница)
-  // Согласно схеме API, page_token должен быть integer
+  // Согласно схеме API, page_token должен быть string и может быть опущен
   if (pageToken !== null) {
     console.log('🔄 [fetchProductsList] page_token before sending:', {
       value: pageToken,

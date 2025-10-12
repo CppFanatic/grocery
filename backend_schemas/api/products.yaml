@@ -44,7 +44,8 @@ components:
                 category_id:
                     type: string
                 page_token:
-                    type: integer
+                    description: A token identifying the first item to receive (use value of next_page_token from previous response). Can be omitted to start from the very beginning.
+                    type: string
                 limit:
                     description: Limits the number of items in the response to this
                         value.
@@ -61,8 +62,8 @@ components:
               - products
             properties:
                 next_page_token:
-                    description: Page token
-                    type: integer
+                    description: A token for fetching the next page of results. Pass this value in the subsequent request to retrieve the next set of items. If absent from the response, it indicates the last page has been reached.
+                    type: string
                 products:
                     description: Products
                     type: array
