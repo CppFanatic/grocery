@@ -1,4 +1,57 @@
-<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
-  <rect width="512" height="512" fill="#8B4513" rx="50"/>
-  <text x="256" y="320" font-family="Arial, sans-serif" font-size="200" font-weight="bold" text-anchor="middle" fill="white">🍕</text>
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background circle with gradient -->
+  <circle cx="256" cy="256" r="256" fill="url(#gradient1)"/>
+  
+  <!-- Plate -->
+  <ellipse cx="256" cy="320" rx="160" ry="53" fill="url(#gradient2)" opacity="0.9"/>
+  
+  <!-- Pizza slice -->
+  <path d="M256 107 L373 267 L256 320 L139 267 Z" fill="url(#gradient3)"/>
+  
+  <!-- Pizza toppings -->
+  <circle cx="213" cy="213" r="11" fill="#FF6B6B"/>
+  <circle cx="293" cy="227" r="8" fill="#4ECDC4"/>
+  <circle cx="227" cy="267" r="8" fill="#45B7D1"/>
+  <circle cx="280" cy="253" r="11" fill="#96CEB4"/>
+  <circle cx="187" cy="240" r="8" fill="#FFEAA7"/>
+  <circle cx="320" cy="200" r="8" fill="#DDA0DD"/>
+  
+  <!-- Fork -->
+  <rect x="80" y="160" width="8" height="67" fill="url(#gradient4)"/>
+  <rect x="75" y="160" width="18" height="5" fill="url(#gradient4)"/>
+  <rect x="72" y="165" width="24" height="3" fill="url(#gradient4)"/>
+  
+  <!-- Knife -->
+  <rect x="427" y="173" width="8" height="53" fill="url(#gradient4)"/>
+  <path d="M427 173 L453 160 L453 186 Z" fill="url(#gradient4)"/>
+  
+  <!-- Steam lines -->
+  <path d="M256 53 Q262 40 267 53" stroke="url(#gradient5)" stroke-width="5" fill="none" opacity="0.7"/>
+  <path d="M240 48 Q246 35 251 48" stroke="url(#gradient5)" stroke-width="5" fill="none" opacity="0.7"/>
+  <path d="M272 48 Q278 35 283 48" stroke="url(#gradient5)" stroke-width="5" fill="none" opacity="0.7"/>
+  
+  <!-- Gradients -->
+  <defs>
+    <linearGradient id="gradient1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#667eea;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#764ba2;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#f093fb;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="gradient2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#ffffff;stop-opacity:0.9" />
+      <stop offset="100%" style="stop-color:#f8f9fa;stop-opacity:0.8" />
+    </linearGradient>
+    <linearGradient id="gradient3" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#FFD93D;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#FF6B6B;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="gradient4" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#E8E8E8;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#C0C0C0;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="gradient5" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#ffffff;stop-opacity:0.8" />
+      <stop offset="100%" style="stop-color:#ffffff;stop-opacity:0.3" />
+    </linearGradient>
+  </defs>
 </svg>

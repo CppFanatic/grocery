@@ -1,18 +1,18 @@
-/* Стили для нижней панели - Итальянская кухня */
+/* Стили для нижней панели - Современный дизайн */
 .bottom-panel {
   position: fixed;
   bottom: 0;
   left: 0;
   right: 0;
-  background: linear-gradient(135deg, #FFF8DC 0%, #F5DEB3 100%);
+  background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(20px);
-  border-top: 3px solid #8B4513;
+  border-top: 2px solid rgba(102, 126, 234, 0.3);
   padding: 16px;
   display: flex;
   justify-content: space-around;
   align-items: center;
   z-index: 1000;
-  box-shadow: 0 -4px 20px rgba(139, 69, 19, 0.3);
+  box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.1);
 }
 
 .panel-item {
@@ -28,7 +28,7 @@
 }
 
 .panel-item:hover {
-  background: rgba(139, 69, 19, 0.1);
+  background: rgba(102, 126, 234, 0.1);
   transform: translateY(-2px);
 }
 
@@ -39,10 +39,9 @@
 
 .panel-item .label {
   font-size: 12px;
-  font-weight: 500;
-  color: #8B4513;
+  font-weight: 600;
+  color: #667eea;
   text-align: center;
-  font-family: 'Georgia', 'Times New Roman', serif;
 }
 
 .panel-item.order-status {
@@ -59,7 +58,7 @@
   position: absolute;
   top: -2px;
   right: -2px;
-  background: #f44336;
+  background: linear-gradient(135deg, #f093fb, #f5576c);
   color: white;
   border-radius: 50%;
   width: 20px;
@@ -69,7 +68,7 @@
   justify-content: center;
   font-size: 10px;
   font-weight: 600;
-  box-shadow: 0 2px 4px rgba(244, 67, 54, 0.3);
+  box-shadow: 0 4px 8px rgba(240, 147, 251, 0.4);
 }
 
 /* Модальное окно корзины */
@@ -88,7 +87,8 @@
 }
 
 .cart-content {
-  background: white;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
   width: 100%;
   max-width: 500px;
   max-height: 80vh;
@@ -96,6 +96,7 @@
   display: flex;
   flex-direction: column;
   animation: slideUp 0.3s ease-out;
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .cart-header {
@@ -108,8 +109,12 @@
 
 .cart-header h2 {
   font-size: 1.5rem;
-  color: #333;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
   margin: 0;
+  font-weight: 700;
 }
 
 .close-btn {
@@ -117,7 +122,7 @@
   border: none;
   font-size: 24px;
   cursor: pointer;
-  color: #666;
+  color: #64748b;
   padding: 0;
   width: 30px;
   height: 30px;
@@ -129,8 +134,8 @@
 }
 
 .close-btn:hover {
-  background: #f5f5f5;
-  color: #333;
+  background: rgba(102, 126, 234, 0.1);
+  color: #667eea;
 }
 
 .cart-items {
@@ -141,7 +146,7 @@
 
 .empty-cart {
   text-align: center;
-  color: #666;
+  color: #64748b;
   padding: 40px 20px;
   font-size: 1.1rem;
 }
@@ -160,13 +165,14 @@
 
 .item-info h4 {
   font-size: 1rem;
-  color: #333;
+  color: #1e293b;
   margin: 0 0 4px 0;
+  font-weight: 600;
 }
 
 .item-info p {
   font-size: 0.9rem;
-  color: #666;
+  color: #64748b;
   margin: 0;
 }
 
@@ -177,7 +183,7 @@
 }
 
 .item-controls button {
-  background: #f5f5f5;
+  background: rgba(102, 126, 234, 0.1);
   border: none;
   width: 32px;
   height: 32px;
@@ -188,47 +194,48 @@
   justify-content: center;
   font-size: 16px;
   font-weight: 600;
-  color: #333;
+  color: #667eea;
   transition: all 0.3s ease;
 }
 
 .item-controls button:hover {
-  background: #e0e0e0;
+  background: rgba(102, 126, 234, 0.2);
 }
 
 .item-controls button.remove-btn {
-  background: #ffebee;
-  color: #f44336;
+  background: rgba(240, 147, 251, 0.1);
+  color: #f5576c;
   font-size: 14px;
 }
 
 .item-controls button.remove-btn:hover {
-  background: #ffcdd2;
+  background: rgba(240, 147, 251, 0.2);
 }
 
 .item-controls span {
   min-width: 24px;
   text-align: center;
   font-weight: 600;
-  color: #333;
+  color: #1e293b;
 }
 
 .cart-footer {
   padding: 20px;
-  border-top: 1px solid #eee;
-  background: #fafafa;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.5);
 }
 
 .total {
   text-align: center;
   margin-bottom: 16px;
   font-size: 1.2rem;
-  color: #333;
+  color: #1e293b;
+  font-weight: 700;
 }
 
 .checkout-btn {
   width: 100%;
-  background: linear-gradient(135deg, #8B4513, #D2691E);
+  background: linear-gradient(135deg, #667eea, #764ba2);
   color: white;
   border: none;
   padding: 16px;
@@ -237,14 +244,13 @@
   font-size: 16px;
   font-weight: 600;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 12px rgba(139, 69, 19, 0.3);
-  font-family: 'Georgia', 'Times New Roman', serif;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
 }
 
 .checkout-btn:hover {
-  background: linear-gradient(135deg, #D2691E, #CD853F);
+  background: linear-gradient(135deg, #764ba2, #667eea);
   transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(139, 69, 19, 0.4);
+  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
 }
 
 /* Анимации */
@@ -273,7 +279,8 @@
 }
 
 .settings-content {
-  background: white;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
   width: 90%;
   max-width: 500px;
   max-height: 80vh;
@@ -281,6 +288,7 @@
   display: flex;
   flex-direction: column;
   animation: slideUp 0.3s ease-out;
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .settings-header {
@@ -293,8 +301,12 @@
 
 .settings-header h2 {
   font-size: 1.5rem;
-  color: #333;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
   margin: 0;
+  font-weight: 700;
 }
 
 .settings-body {
@@ -310,7 +322,7 @@
 .setting-item label {
   display: block;
   font-weight: 600;
-  color: #333;
+  color: #1e293b;
   margin-bottom: 8px;
   font-size: 1rem;
 }
@@ -318,40 +330,42 @@
 .api-url-input {
   width: 100%;
   padding: 12px 16px;
-  border: 2px solid #e0e0e0;
-  border-radius: 8px;
+  border: 2px solid rgba(102, 126, 234, 0.2);
+  border-radius: 12px;
   font-size: 14px;
-  transition: border-color 0.3s ease;
+  transition: all 0.3s ease;
   box-sizing: border-box;
+  background: rgba(255, 255, 255, 0.8);
 }
 
 .api-url-input:focus {
   outline: none;
-  border-color: #2196F3;
-  box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.1);
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
 
 .auth-token-input {
   width: 100%;
   padding: 12px 16px;
-  border: 2px solid #e0e0e0;
-  border-radius: 8px;
+  border: 2px solid rgba(102, 126, 234, 0.2);
+  border-radius: 12px;
   font-size: 14px;
-  transition: border-color 0.3s ease;
+  transition: all 0.3s ease;
   box-sizing: border-box;
   font-family: monospace;
+  background: rgba(255, 255, 255, 0.8);
 }
 
 .auth-token-input:focus {
   outline: none;
-  border-color: #2196F3;
-  box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.1);
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
 
 .api-url-input:disabled,
 .auth-token-input:disabled {
-  background-color: #f5f5f5;
-  color: #999;
+  background-color: rgba(255, 255, 255, 0.5);
+  color: #64748b;
   cursor: not-allowed;
 }
 
@@ -360,7 +374,7 @@
   align-items: center;
   cursor: pointer;
   font-weight: 600;
-  color: #333;
+  color: #1e293b;
   margin-bottom: 8px;
 }
 
@@ -377,35 +391,35 @@
 
 .setting-description {
   font-size: 0.85rem;
-  color: #666;
+  color: #64748b;
   margin-top: 8px;
   line-height: 1.4;
 }
 
 .cors-warning {
-  background: #fff3cd;
-  border: 1px solid #ffeaa7;
-  border-radius: 8px;
+  background: rgba(240, 147, 251, 0.1);
+  border: 1px solid rgba(240, 147, 251, 0.3);
+  border-radius: 12px;
   padding: 12px;
   margin-top: 12px;
   font-size: 0.85rem;
-  color: #856404;
+  color: #f5576c;
   line-height: 1.4;
 }
 
 .cors-warning strong {
-  color: #d63031;
+  color: #f5576c;
 }
 
 .settings-footer {
   padding: 20px;
-  border-top: 1px solid #eee;
-  background: #fafafa;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.5);
 }
 
 .save-btn {
   width: 100%;
-  background: linear-gradient(135deg, #8B4513, #D2691E);
+  background: linear-gradient(135deg, #667eea, #764ba2);
   color: white;
   border: none;
   padding: 16px;
@@ -414,14 +428,13 @@
   font-size: 16px;
   font-weight: 600;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 12px rgba(139, 69, 19, 0.3);
-  font-family: 'Georgia', 'Times New Roman', serif;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
 }
 
 .save-btn:hover {
-  background: linear-gradient(135deg, #D2691E, #CD853F);
+  background: linear-gradient(135deg, #764ba2, #667eea);
   transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(139, 69, 19, 0.4);
+  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
 }
 
 /* Адаптивность */

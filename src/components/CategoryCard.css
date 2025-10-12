@@ -1,21 +1,22 @@
-/* Стили для карточки категории - Итальянская кухня */
+/* Стили для карточки категории - Современный дизайн */
 .category-card {
-  background: linear-gradient(135deg, #FFF8DC 0%, #F5DEB3 100%);
-  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 20px;
   overflow: hidden;
-  box-shadow: 0 4px 20px rgba(139, 69, 19, 0.2);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
   transition: all 0.3s ease;
   cursor: pointer;
   height: 100%;
   display: flex;
   flex-direction: column;
-  border: 2px solid #D2691E;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
 }
 
 .category-card:hover {
   transform: translateY(-8px);
-  box-shadow: 0 8px 30px rgba(139, 69, 19, 0.3);
-  border-color: #8B4513;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+  border-color: rgba(102, 126, 234, 0.3);
 }
 
 .category-image {
@@ -47,15 +48,17 @@
 
 .category-name {
   font-size: 1.3rem;
-  font-weight: 600;
-  color: #8B4513;
+  font-weight: 700;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
   margin-bottom: 8px;
   line-height: 1.3;
-  font-family: 'Georgia', 'Times New Roman', serif;
 }
 
 .category-description {
-  color: #666;
+  color: #64748b;
   font-size: 0.9rem;
   line-height: 1.4;
 }
