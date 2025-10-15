@@ -19,6 +19,8 @@ const CarouselWidget = ({ widget, products = [], onAddToCart, onCategoryClick, l
   const [itemsPerView, setItemsPerView] = useState(3);
   const [touchStart, setTouchStart] = useState(0);
   const [touchEnd, setTouchEnd] = useState(0);
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragOffset, setDragOffset] = useState(0);
 
   // Ограничиваем максимальное количество продуктов до 5
   const limitedProducts = products.slice(0, 5);
@@ -71,20 +73,36 @@ const CarouselWidget = ({ widget, products = [], onAddToCart, onCategoryClick, l
     }
   };
 
-  // Минимальное расстояние свайпа в пикселях
+  // Минимальное расстояние свайпа в пикселях для смены слайда
   const minSwipeDistance = 50;
 
-  // Обработчики свайпа
+  // Обработчики свайпа с плавным следованием за пальцем
   const handleTouchStart = (e) => {
-    setTouchEnd(0); // Сбрасываем предыдущее значение
+    setIsDragging(true);
+    setTouchEnd(0);
     setTouchStart(e.targetTouches[0].clientX);
+    setDragOffset(0);
   };
 
   const handleTouchMove = (e) => {
-    setTouchEnd(e.targetTouches[0].clientX);
+    if (!isDragging) return;
+    
+    const currentTouch = e.targetTouches[0].clientX;
+    setTouchEnd(currentTouch);
+    
+    // Вычисляем смещение в процентах относительно ширины контейнера
+    const containerWidth = e.currentTarget.offsetWidth;
+    const dragDistance = currentTouch - touchStart;
+    const dragPercent = (dragDistance / containerWidth) * 100;
+    
+    // Применяем смещение с учетом текущего индекса
+    setDragOffset(dragPercent);
   };
 
   const handleTouchEnd = () => {
+    setIsDragging(false);
+    setDragOffset(0);
+    
     if (!touchStart || !touchEnd) return;
     
     const distance = touchStart - touchEnd;
@@ -93,10 +111,13 @@ const CarouselWidget = ({ widget, products = [], onAddToCart, onCategoryClick, l
 
     if (isLeftSwipe && canGoNext) {
       goToNext();
-    }
-    if (isRightSwipe && canGoPrevious) {
+    } else if (isRightSwipe && canGoPrevious) {
       goToPrevious();
     }
+    
+    // Сбрасываем значения
+    setTouchStart(0);
+    setTouchEnd(0);
   };
 
   console.log('🎠 [CarouselWidget] Рендерим карусель:', widget.title, 'с', limitedProducts.length, 'продуктами');
@@ -132,9 +153,9 @@ const CarouselWidget = ({ widget, products = [], onAddToCart, onCategoryClick, l
         onTouchEnd={handleTouchEnd}
       >
         <div 
-          className="carousel-widget__track"
+          className={`carousel-widget__track ${isDragging ? 'carousel-widget__track--dragging' : ''}`}
           style={{
-            transform: `translateX(-${currentIndex * (100 / itemsPerView)}%)`,
+            transform: `translateX(calc(-${currentIndex * (100 / itemsPerView)}% + ${dragOffset}%))`,
             width: `${(totalItems / itemsPerView) * 100}%`
           }}
         >
