@@ -41,9 +41,9 @@ const MainView = ({
       console.log('🎠 [MainView] Загружаем продукты для карусели категории:', categoryId);
       setCarouselLoading(prev => ({ ...prev, [categoryId]: true }));
       
-      // Загружаем только первую страницу с лимитом 10 (максимум для карусели)
+      // Загружаем только первую страницу с лимитом 5 (максимум для карусели)
       // Используем пустой page_token для первой страницы
-      const result = await onLoadProducts(categoryId, '', 10);
+      const result = await onLoadProducts(categoryId, '', 5);
       
       setCarouselProducts(prev => ({ 
         ...prev, 
@@ -170,6 +170,7 @@ const MainView = ({
                 widget={widget}
                 products={products}
                 onAddToCart={handleAddToCart}
+                onCategoryClick={handleCategoryClick}
                 loading={isLoading}
               />
             );

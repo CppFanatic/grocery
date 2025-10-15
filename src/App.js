@@ -1,10 +1,12 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, lazy, Suspense } from 'react';
 import MainView from './components/MainView';
-import CategoryView from './components/CategoryView';
-import BottomPanel from './components/BottomPanel';
 import StoreSelector from './components/StoreSelector';
 import { useApi } from './hooks/useApi';
 import './App.css';
+
+// Lazy load components that aren't immediately needed
+const CategoryView = lazy(() => import('./components/CategoryView'));
+const BottomPanel = lazy(() => import('./components/BottomPanel'));
 
 function App() {
   const [cart, setCart] = useState([]);
@@ -255,35 +257,39 @@ function App() {
             retryCount={retryCount}
           />
         ) : (
-          <CategoryView
-            category={selectedCategory}
-            onAddToCart={addToCart}
-            onBack={handleBackToMain}
-            onLoadProducts={loadCategoryProducts}
-            loading={api.loading}
-            error={api.error}
-            locale={locale}
-          />
+          <Suspense fallback={<div className="loading-fallback">Загрузка...</div>}>
+            <CategoryView
+              category={selectedCategory}
+              onAddToCart={addToCart}
+              onBack={handleBackToMain}
+              onLoadProducts={loadCategoryProducts}
+              loading={api.loading}
+              error={api.error}
+              locale={locale}
+            />
+          </Suspense>
         )}
       </main>
       
-      <BottomPanel 
-        cart={cart}
-        orderStatus={orderStatus}
-        isLoggedIn={isLoggedIn}
-        onLogin={() => setIsLoggedIn(!isLoggedIn)}
-        onUpdateQuantity={updateQuantity}
-        onRemoveFromCart={removeFromCart}
-        totalItems={getTotalItems()}
-        totalPrice={getTotalPrice()}
-        apiUrl={apiUrl}
-        onApiUrlChange={setApiUrl}
-        authToken={authToken}
-        onAuthTokenChange={setAuthToken}
-        onCheckout={handleCheckout}
-        locale={locale}
-        onLocaleChange={setLocale}
-      />
+      <Suspense fallback={<div className="loading-fallback">Загрузка панели...</div>}>
+        <BottomPanel 
+          cart={cart}
+          orderStatus={orderStatus}
+          isLoggedIn={isLoggedIn}
+          onLogin={() => setIsLoggedIn(!isLoggedIn)}
+          onUpdateQuantity={updateQuantity}
+          onRemoveFromCart={removeFromCart}
+          totalItems={getTotalItems()}
+          totalPrice={getTotalPrice()}
+          apiUrl={apiUrl}
+          onApiUrlChange={setApiUrl}
+          authToken={authToken}
+          onAuthTokenChange={setAuthToken}
+          onCheckout={handleCheckout}
+          locale={locale}
+          onLocaleChange={setLocale}
+        />
+      </Suspense>
     </div>
   );
 }

@@ -52,6 +52,12 @@
 .carousel-widget__container {
   overflow: hidden;
   padding: 0 1rem;
+  touch-action: pan-y pinch-zoom;
+  cursor: grab;
+}
+
+.carousel-widget__container:active {
+  cursor: grabbing;
 }
 
 .carousel-widget__track {
@@ -123,6 +129,61 @@
   background: #007bff;
 }
 
+.carousel-widget__view-all-card {
+  height: 100%;
+  min-height: 300px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  padding: 2rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  color: white;
+}
+
+.carousel-widget__view-all-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 12px rgba(0, 0, 0, 0.15);
+}
+
+.carousel-widget__view-all-card:active {
+  transform: translateY(-2px);
+}
+
+.carousel-widget__view-all-icon {
+  font-size: 4rem;
+  font-weight: bold;
+  margin-bottom: 1rem;
+  animation: slideRight 1.5s ease-in-out infinite;
+}
+
+@keyframes slideRight {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(10px);
+  }
+}
+
+.carousel-widget__view-all-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin: 0 0 0.5rem 0;
+  text-align: center;
+}
+
+.carousel-widget__view-all-subtitle {
+  font-size: 1rem;
+  margin: 0;
+  opacity: 0.9;
+  text-align: center;
+}
+
 @media (max-width: 768px) {
   .carousel-widget__title {
     font-size: 1.25rem;
@@ -136,5 +197,22 @@
   
   .carousel-widget__item {
     padding: 0 0.25rem;
+  }
+  
+  .carousel-widget__view-all-card {
+    min-height: 250px;
+    padding: 1.5rem;
+  }
+  
+  .carousel-widget__view-all-icon {
+    font-size: 3rem;
+  }
+  
+  .carousel-widget__view-all-title {
+    font-size: 1.25rem;
+  }
+  
+  .carousel-widget__view-all-subtitle {
+    font-size: 0.875rem;
   }
 }
