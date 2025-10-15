@@ -270,9 +270,9 @@ export const fetchProductsList = async (baseUrl, authToken, locale = 'en', categ
     requestBody.store_id = storeId;
   }
   
-  // Добавляем page_token только если он не null (не первая страница)
-  // Согласно схеме API, page_token должен быть string и может быть опущен
-  if (pageToken !== null) {
+  // Добавляем page_token только если он не null и не пустая строка (не первая страница)
+  // Согласно схеме API, page_token должен быть string и может быть опущен для первой страницы
+  if (pageToken !== null && pageToken !== '') {
     console.log('🔄 [fetchProductsList] page_token before sending:', {
       value: pageToken,
       type: typeof pageToken
