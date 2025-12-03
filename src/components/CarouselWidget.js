@@ -224,4 +224,4 @@ const CarouselWidget = ({ widget, products = [], onAddToCart, onCategoryClick, l
   );
 };
 
-export default CarouselWidget;
+export default React.memo(CarouselWidget);

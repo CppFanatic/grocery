@@ -1,0 +1,87 @@
+openapi: 3.0.0
+info:
+    version: '1.0'
+
+
+paths:
+    /b2b/v1/front/carts/set:
+        post:
+            summary: Create or update cart
+            description: Create or update cart. ID and version must be specified to
+                update existing cart.
+            parameters:
+              - $ref: '../definitions.yaml#/components/parameters/IdempotencyHeader'
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/CartsSetRequest'
+            responses:
+                '200':
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '../definitions.yaml#/components/schemas/ResponseCart'
+                '404':
+                    description: Cart not found
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '../definitions.yaml#/components/schemas/ResponseBodyError'
+components:
+    schemas:
+        CartsSetRequest:
+            description: Cart set request. Either position (for courier delivery)
+                or store_id (for fulfillment_method = 'pickup') must be specified.
+                Omit id and version to create new cart (old cart will be removed).
+                ID and version must be specified to update existing cart.
+            type: object
+            additionalProperties: false
+            required:
+              - items
+              - fulfillment_method
+            properties:
+                position:
+                    description: Delivery position
+                    $ref: '../definitions.yaml#/components/schemas/Point'
+                store_id:
+                    description: Store identifier.
+                    $ref: '../definitions.yaml#/components/schemas/StoreId'
+                fulfillment_method:
+                    description: Fulfillment method
+                    type: string
+                    enum:
+                      - pickup
+                      - courier
+                items:
+                    description: Cart items
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/CartItem'
+                    maxItems: 100
+                id:
+                    description: Cart ID
+                    type: string
+                    format: uuid
+                    x-taxi-cpp-typedef-tag: grocery_shared::CartIdTag
+                version:
+                    description: Cart version control field for optimistic concurrency
+                        control. Must match the current cart version to successfully
+                        update. Prevents overwriting changes made by concurrent requests.
+                    type: integer
+        CartItem:
+            description: Cart item.
+            type: object
+            additionalProperties: false
+            required:
+              - id
+              - quantity
+            properties:
+                id:
+                    description: Product ID
+                    type: string
+                quantity:
+                    description: Quantity of the item
+                    type: integer

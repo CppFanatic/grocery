@@ -15,4 +15,4 @@ function CategoryCard({ category, onClick }) {
   );
 }
 
-export default CategoryCard;
+export default React.memo(CategoryCard);

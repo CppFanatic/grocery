@@ -36,4 +36,4 @@ const GroupWidget = ({ widget, onCategoryClick }) => {
   );
 };
 
-export default GroupWidget;
+export default React.memo(GroupWidget);

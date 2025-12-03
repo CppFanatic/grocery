@@ -1,19 +1,13 @@
 components:
     parameters:
-        CompanyId:
+        IdempotencyHeader:
             in: header
-            name: X-Company-ID
-            description: Company identifier.
+            name: X-Idempotency-Token
+            description: Idempotency token.
+            required: true
             schema:
                 type: string
-                minLength: 1
-        MerchantName:
-            in: header
-            name: X-Merchant-Name
-            description: Merchant name.
-            schema:
-                type: string
-                minLength: 1
+                maxLength: 128
 
     schemas:
         EmptyRequest:
@@ -27,6 +21,9 @@ components:
             description: Reason for error response
             enum:
               - grid_not_found
+              - main_not_found
+              - category_not_found
+              - incorrect_page_token
 
         ResponseBodyError:
             type: object
@@ -53,7 +50,6 @@ components:
             minLength: 2
             maxLength: 2
             default: 'en'
-
         Category:
             description: Category
             type: object
@@ -71,34 +67,18 @@ components:
                 image_url:
                     description: Image URL
                     type: string
-
         StoreId:
             description: A unique identifier for the store.
             type: string
+            x-taxi-cpp-type: grocery_shared::LegacyDepotId
             minLength: 1
             maxLength: 255
             example: '12345678-abcd-efgh-ijkl-1234567890ab'
-
-        StoreName:
-            description: Store name.
+        Numeric:
             type: string
-            minLength: 6
-            maxLength: 1024
-            example: 'Store 1'
-
-        StoreType:
-            description: Store type.
-            type: string
-            enum:
-              - darkstore
-              - retail_store
-              - distribution_center
-
-        TimeZone:
-            description: Time zone.
-            type: string
-            example: Europe/Paris
-
+            pattern: '^\d+(\.\d*)?$'
+            description: Basically Decimal<4>
+            example: "56.1234"
         Point:
             type: object
             additionalProperties: false
@@ -118,13 +98,67 @@ components:
                     minimum: -180
                     maximum: 180
 
-        Time:
-            type: string
-            pattern: '^\d{2}:\d{2}$'
-            example: "07:00"
-
-        Numeric:
-            type: string
-            pattern: '^\d+(\.\d*)?$'
-            description: Basically Decimal<4>
-            example: "56.1234"
+        ResponseCart:
+            description: Cart in response.
+            type: object
+            additionalProperties: false
+            required:
+              - id
+              - version
+              - items
+              - total_price
+            properties:
+                id:
+                    description: Cart ID
+                    type: string
+                version:
+                    description: Cart version
+                    type: integer
+                items:
+                    description: Cart items
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/ResponseCartItem'
+                total_price:
+                    description: Final price of the cart (including discounts and
+                        fees)
+                    $ref: '#/components/schemas/Numeric'
+                full_price:
+                    description: Full price of items in the cart (excluding discounts
+                        and fees)
+                    $ref: '#/components/schemas/Numeric'
+                delivery_fee:
+                    description: Delivery fee
+                    $ref: '#/components/schemas/Numeric'
+                service_fee:
+                    description: Service fee
+                    $ref: '#/components/schemas/Numeric'
+        ResponseCartItem:
+            description: Cart item.
+            type: object
+            additionalProperties: false
+            required:
+              - id
+              - price
+              - full_price
+              - quantity
+              - title
+            properties:
+                id:
+                    description: Product ID
+                    type: string
+                price:
+                    description: Product price for one item (including discounts)
+                    $ref: '#/components/schemas/Numeric'
+                full_price:
+                    description: Product price for one item (excluding discounts)
+                    $ref: '#/components/schemas/Numeric'
+                quantity:
+                    description: Product quantity
+                    $ref: '#/components/schemas/Numeric'
+                title:
+                    description: Product title
+                    type: string
+                image_url:
+                    description: Product image URL
+                    type: string

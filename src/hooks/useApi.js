@@ -1,11 +1,13 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import { 
   createOrder, 
   fetchOrderStatus, 
   updateOrderStatus,
   fetchStores,
   fetchMains,
-  fetchProductsList
+  fetchProductsList,
+  fetchCart,
+  setCart
 } from '../utils/api';
 
 /**
@@ -74,7 +76,18 @@ export const useApi = (baseUrl, authToken) => {
     return handleApiCall(fetchProductsList, locale, categoryId, pageToken, limit, storeId);
   }, [handleApiCall]);
 
-  return {
+  const getCart = useCallback((cartId = null) => {
+    console.log('🛒 [useApi] Вызывается getCart с ID:', cartId || 'current user cart');
+    return handleApiCall(fetchCart, cartId);
+  }, [handleApiCall]);
+
+  const updateCart = useCallback((cartData) => {
+    console.log('🛒 [useApi] Вызывается updateCart с данными:', cartData);
+    return handleApiCall(setCart, cartData);
+  }, [handleApiCall]);
+
+  // Memoize the return object to prevent unnecessary re-renders
+  return useMemo(() => ({
     loading,
     error,
     submitOrder,
@@ -82,6 +95,19 @@ export const useApi = (baseUrl, authToken) => {
     updateOrder,
     getStores,
     getMains,
-    getProductsList
-  };
+    getProductsList,
+    getCart,
+    updateCart
+  }), [
+    loading,
+    error,
+    submitOrder,
+    getOrderStatus,
+    updateOrder,
+    getStores,
+    getMains,
+    getProductsList,
+    getCart,
+    updateCart
+  ]);
 };

@@ -184,4 +184,4 @@ const MainView = ({
   );
 };
 
-export default MainView;
+export default React.memo(MainView);

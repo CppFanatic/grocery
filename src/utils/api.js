@@ -157,15 +157,26 @@ export const apiRequest = async (endpoint, baseUrl, authToken, options = {}) => 
 
 
 /**
- * Создает новый заказ
+ * Создает новый заказ из корзины
  * @param {string} baseUrl - Базовый URL API
  * @param {string} authToken - Токен авторизации
  * @param {Object} orderData - Данные заказа
- * @returns {Promise<Object>} - Promise с результатом создания заказа
+ * @param {Object} orderData.position - Координаты доставки {lat: number, lon: number}
+ * @param {string} orderData.cart_id - ID корзины
+ * @param {number} orderData.cart_version - Версия корзины
+ * @returns {Promise<Object>} - Promise с результатом создания заказа {order_id: string}
  */
 export const createOrder = async (baseUrl, authToken, orderData) => {
-  return apiRequest('/orders', baseUrl, authToken, {
+  console.log('📦 [createOrder] Создаём заказ:', orderData);
+  
+  // Генерируем idempotency token для безопасности запроса
+  const idempotencyToken = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+  
+  return apiRequest('/b2b/v1/front/orders/create', baseUrl, authToken, {
     method: 'POST',
+    headers: {
+      'X-Idempotency-Token': idempotencyToken
+    },
     body: JSON.stringify(orderData)
   });
 };
@@ -284,6 +295,80 @@ export const fetchProductsList = async (baseUrl, authToken, locale = 'en', categ
 
   return apiRequest('/b2b/v1/front/products/list', baseUrl, authToken, {
     method: 'POST',
+    body: JSON.stringify(requestBody)
+  });
+};
+
+/**
+ * Получает корзину пользователя
+ * @param {string} baseUrl - Базовый URL API
+ * @param {string} authToken - Токен авторизации
+ * @param {string|null} cartId - ID корзины (опционально, если не указан - вернётся текущая корзина пользователя)
+ * @returns {Promise<Object>} - Promise с данными корзины
+ */
+export const fetchCart = async (baseUrl, authToken, cartId = null) => {
+  console.log('🛒 [fetchCart] Загружаем корзину, ID:', cartId || 'current user cart');
+  
+  const requestBody = {};
+  if (cartId) {
+    requestBody.id = cartId;
+  }
+
+  return apiRequest('/b2b/v1/front/carts/get', baseUrl, authToken, {
+    method: 'POST',
+    body: JSON.stringify(requestBody)
+  });
+};
+
+/**
+ * Создаёт или обновляет корзину
+ * @param {string} baseUrl - Базовый URL API
+ * @param {string} authToken - Токен авторизации
+ * @param {Object} cartData - Данные корзины
+ * @param {Array} cartData.items - Массив товаров в корзине [{id: string, quantity: number}]
+ * @param {string} cartData.fulfillment_method - Способ получения ('pickup' или 'courier')
+ * @param {string|null} cartData.store_id - ID склада (обязателен для pickup)
+ * @param {Object|null} cartData.position - Координаты доставки (обязательны для courier)
+ * @param {string|null} cartData.id - ID корзины (для обновления существующей)
+ * @param {number|null} cartData.version - Версия корзины (для обновления существующей)
+ * @returns {Promise<Object>} - Promise с обновлённой корзиной
+ */
+export const setCart = async (baseUrl, authToken, cartData) => {
+  console.log('🛒 [setCart] Обновляем корзину:', cartData);
+  
+  // Генерируем idempotency token для безопасности запроса
+  const idempotencyToken = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+  
+  const requestBody = {
+    items: cartData.items || [],
+    fulfillment_method: cartData.fulfillment_method || 'pickup'
+  };
+
+  // Добавляем store_id для pickup
+  if (cartData.store_id) {
+    requestBody.store_id = cartData.store_id;
+  }
+
+  // Добавляем position для courier
+  if (cartData.position) {
+    requestBody.position = cartData.position;
+  }
+
+  // Добавляем id и version для обновления существующей корзины
+  if (cartData.id) {
+    requestBody.id = cartData.id;
+  }
+  if (cartData.version !== undefined && cartData.version !== null) {
+    requestBody.version = cartData.version;
+  }
+
+  console.log('📦 [setCart] Request body:', requestBody);
+
+  return apiRequest('/b2b/v1/front/carts/set', baseUrl, authToken, {
+    method: 'POST',
+    headers: {
+      'X-Idempotency-Token': idempotencyToken
+    },
     body: JSON.stringify(requestBody)
   });
 };

@@ -48,7 +48,7 @@ components:
                 id:
                     $ref: '../definitions.yaml#/components/schemas/StoreId'
                 name:
-                    $ref: '../definitions.yaml#/components/schemas/StoreName'
+                    $ref: '#/components/schemas/StoreName'
                 status:
                     description: Store status.
                     $ref: '#/components/schemas/StoreStatus'
@@ -60,7 +60,7 @@ components:
                     type: string
                 timezone:
                     description: Store timezone
-                    $ref: '../definitions.yaml#/components/schemas/TimeZone'
+                    $ref: '#/components/schemas/TimeZone'
                 store_schedule:
                     description: >
                         Store schedule is a collection of rules, that can apply to
@@ -131,10 +131,10 @@ components:
                     $ref: '#/components/schemas/StoreScheduleItemType'
                 open_time:
                     description: The time when the store is opened.
-                    $ref: '../definitions.yaml#/components/schemas/Time'
+                    $ref: '#/components/schemas/Time'
                 close_time:
                     description: The time when the store is closed.
-                    $ref: '../definitions.yaml#/components/schemas/Time'
+                    $ref: '#/components/schemas/Time'
 
         StoreScheduleItemType:
             description: >
@@ -153,3 +153,20 @@ components:
               - saturday
               - sunday
             example: tuesday
+
+        StoreName:
+            description: Store name.
+            type: string
+            minLength: 6
+            maxLength: 1024
+            example: 'Store 1'
+
+        TimeZone:
+            description: Time zone.
+            type: string
+            example: Europe/Paris
+
+        Time:
+            type: string
+            pattern: '^\d{2}:\d{2}$'
+            example: "07:00"

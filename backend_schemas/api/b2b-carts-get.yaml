@@ -1,0 +1,42 @@
+openapi: 3.0.0
+info:
+    version: '1.0'
+
+
+paths:
+    /b2b/v1/front/carts/get:
+        post:
+            summary: Get cart
+            description: Get cart by ID. If cart ID is ommitted, then current cart
+                of the user will be returned.
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/CartsGetRequest'
+            responses:
+                '200':
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '../definitions.yaml#/components/schemas/ResponseCart'
+                '404':
+                    description: Cart not found
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '../definitions.yaml#/components/schemas/ResponseBodyError'
+components:
+    schemas:
+        CartsGetRequest:
+            description: Cart get request.
+            type: object
+            additionalProperties: false
+            properties:
+                id:
+                    description: Cart ID
+                    type: string
+                    format: uuid
+                    x-taxi-cpp-typedef-tag: grocery_shared::CartIdTag

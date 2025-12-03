@@ -1,0 +1,57 @@
+openapi: 3.0.0
+info:
+    version: '1.0'
+
+
+paths:
+    /b2b/v1/front/orders/create:
+        post:
+            summary: Create order
+            description: Create order by specifying previously created cart
+            parameters:
+              - $ref: '../definitions.yaml#/components/parameters/IdempotencyHeader'
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/OrdersCreateRequest'
+            responses:
+                '200':
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/OrdersCreateResponse'
+components:
+    schemas:
+        OrdersCreateRequest:
+            description: Order create request.
+            type: object
+            additionalProperties: false
+            required:
+              - position
+              - cart_id
+              - cart_version
+            properties:
+                position:
+                    description: Delivery position
+                    $ref: '../definitions.yaml#/components/schemas/Point'
+                cart_id:
+                    description: Cart ID
+                    type: string
+                    format: uuid
+                    x-taxi-cpp-typedef-tag: grocery_shared::CartIdTag
+                cart_version:
+                    description: Cart version
+                    type: integer
+        OrdersCreateResponse:
+            description: Order create response.
+            type: object
+            additionalProperties: false
+            required:
+              - order_id
+            properties:
+                order_id:
+                    description: Order ID
+                    type: string

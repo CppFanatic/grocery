@@ -9,50 +9,194 @@ const CategoryView = lazy(() => import('./components/CategoryView'));
 const BottomPanel = lazy(() => import('./components/BottomPanel'));
 
 function App() {
-  const [cart, setCart] = useState([]);
+  const [cart, setCart] = useState([]); // Local cache of server cart
+  const [cartId, setCartId] = useState(null); // Server cart ID
+  const [cartVersion, setCartVersion] = useState(null); // Server cart version for optimistic concurrency
   const [orderStatus, setOrderStatus] = useState('Нет заказов');
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [apiUrl, setApiUrl] = useState('http://localhost:3005');
   const [authToken, setAuthToken] = useState('');
   const [selectedStore, setSelectedStore] = useState(null);
   const [mainsData, setMainsData] = useState(null);
+  const [mainsLoading, setMainsLoading] = useState(false); // Separate loading state for main view
+  const [mainsError, setMainsError] = useState(null); // Separate error state for main view
   const [locale, setLocale] = useState('en');
   const [retryCount, setRetryCount] = useState(0);
   const [currentView, setCurrentView] = useState('main'); // 'main' or 'category'
   const [selectedCategory, setSelectedCategory] = useState(null);
 
+  // Use refs to avoid recreating syncCart when cartId/cartVersion change
+  const cartIdRef = React.useRef(cartId);
+  const cartVersionRef = React.useRef(cartVersion);
+
+  // Keep refs in sync with state
+  React.useEffect(() => {
+    cartIdRef.current = cartId;
+    cartVersionRef.current = cartVersion;
+  }, [cartId, cartVersion]);
+
   // Инициализируем API хук
   const api = useApi(apiUrl, authToken);
 
-  const addToCart = (product) => {
+  // Загружает корзину с сервера
+  const loadCart = useCallback(async () => {
+    if (!selectedStore) {
+      console.log('🛒 [App] Склад не выбран, пропускаем загрузку корзины');
+      return;
+    }
+
+    try {
+      console.log('🛒 [App] Загружаем корзину с сервера...');
+      const response = await api.getCart();
+      
+      if (response && response.id) {
+        console.log('✅ [App] Корзина загружена:', response);
+        setCartId(response.id);
+        setCartVersion(response.version);
+        
+        // Преобразуем items из ResponseCartItem в формат для локального состояния
+        const cartItems = (response.items || []).map(item => ({
+          id: item.id,
+          title: item.title,
+          name: item.title, // Алиас для совместимости
+          price: parseFloat(item.price),
+          quantity: parseFloat(item.quantity),
+          image_url: item.image_url
+        }));
+        
+        setCart(cartItems);
+      }
+    } catch (error) {
+      console.error('❌ [App] Ошибка загрузки корзины:', error);
+      // Если корзина не найдена (404), это нормально - создадим новую при первом добавлении
+      if (error.message && error.message.includes('404')) {
+        console.log('ℹ️ [App] Корзина не найдена, будет создана при добавлении товара');
+        setCart([]);
+        setCartId(null);
+        setCartVersion(null);
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedStore]);
+
+  // Синхронизирует корзину с сервером
+  const syncCart = useCallback(async (updatedCart) => {
+    if (!selectedStore) {
+      console.warn('⚠️ [App] Склад не выбран, невозможно синхронизировать корзину');
+      return;
+    }
+
+    try {
+      console.log('🔄 [App] Синхронизируем корзину с сервером...');
+      
+      // Формируем запрос согласно OpenAPI схеме
+      const cartData = {
+        items: updatedCart.map(item => ({
+          id: item.id,
+          quantity: item.quantity
+        })),
+        fulfillment_method: 'pickup', // Используем pickup т.к. у нас выбран склад
+        store_id: selectedStore.id
+      };
+
+      // Добавляем id и version если корзина уже существует (используем refs)
+      if (cartIdRef.current) {
+        cartData.id = cartIdRef.current;
+        cartData.version = cartVersionRef.current;
+      }
+
+      const response = await api.updateCart(cartData);
+      
+      if (response && response.id) {
+        console.log('✅ [App] Корзина синхронизирована:', response);
+        setCartId(response.id);
+        setCartVersion(response.version);
+        
+        // Обновляем локальное состояние из ответа сервера
+        const cartItems = (response.items || []).map(item => ({
+          id: item.id,
+          title: item.title,
+          name: item.title,
+          price: parseFloat(item.price),
+          quantity: parseFloat(item.quantity),
+          image_url: item.image_url
+        }));
+        
+        setCart(cartItems);
+      }
+    } catch (error) {
+      console.error('❌ [App] Ошибка синхронизации корзины:', error);
+      // При ошибке откатываем к предыдущему состоянию
+      await loadCart();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedStore, loadCart]);
+
+  const addToCart = useCallback(async (product) => {
+    console.log('➕ [App] Добавляем товар в корзину:', product.id);
+    
+    // Оптимистическое обновление UI с функциональным обновлением
+    let updatedCart;
     setCart(prevCart => {
       const existingItem = prevCart.find(item => item.id === product.id);
       if (existingItem) {
-        return prevCart.map(item =>
+        updatedCart = prevCart.map(item =>
           item.id === product.id
             ? { ...item, quantity: item.quantity + 1 }
             : item
         );
+      } else {
+        updatedCart = [...prevCart, { 
+          id: product.id,
+          title: product.title,
+          name: product.title,
+          price: product.price,
+          quantity: 1,
+          image_url: product.image_url
+        }];
       }
-      return [...prevCart, { ...product, quantity: 1 }];
+      return updatedCart;
     });
-  };
+    
+    // Синхронизируем с сервером асинхронно
+    // Используем setTimeout чтобы updatedCart был доступен
+    setTimeout(() => syncCart(updatedCart), 0);
+  }, [syncCart]);
 
-  const removeFromCart = (productId) => {
-    setCart(prevCart => prevCart.filter(item => item.id !== productId));
-  };
+  const removeFromCart = useCallback(async (productId) => {
+    console.log('➖ [App] Удаляем товар из корзины:', productId);
+    
+    // Оптимистическое обновление UI с функциональным обновлением
+    let updatedCart;
+    setCart(prevCart => {
+      updatedCart = prevCart.filter(item => item.id !== productId);
+      return updatedCart;
+    });
+    
+    // Синхронизируем с сервером асинхронно
+    setTimeout(() => syncCart(updatedCart), 0);
+  }, [syncCart]);
 
-  const updateQuantity = (productId, quantity) => {
+  const updateQuantity = useCallback(async (productId, quantity) => {
+    console.log('🔢 [App] Обновляем количество товара:', productId, 'новое количество:', quantity);
+    
     if (quantity <= 0) {
-      removeFromCart(productId);
+      await removeFromCart(productId);
       return;
     }
-    setCart(prevCart =>
-      prevCart.map(item =>
+    
+    // Оптимистическое обновление UI с функциональным обновлением
+    let updatedCart;
+    setCart(prevCart => {
+      updatedCart = prevCart.map(item =>
         item.id === productId ? { ...item, quantity } : item
-      )
-    );
-  };
+      );
+      return updatedCart;
+    });
+    
+    // Синхронизируем с сервером асинхронно
+    setTimeout(() => syncCart(updatedCart), 0);
+  }, [syncCart, removeFromCart]);
 
   const getTotalItems = () => {
     return cart.reduce((total, item) => total + item.quantity, 0);
@@ -66,6 +210,9 @@ function App() {
   const loadMains = useCallback(async () => {
     if (mainsData) return;
 
+    setMainsLoading(true);
+    setMainsError(null);
+    
     try {
       console.log('🏠 [App] Загружаем главную страницу...');
       console.log('🔍 [App] Параметры запроса:', { locale, apiUrl, retryCount });
@@ -107,8 +254,12 @@ function App() {
       }
       
       setMainsData(null);
+      setMainsError(error.message);
+    } finally {
+      setMainsLoading(false);
     }
-  }, [api, locale, apiUrl, mainsData, retryCount]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [locale, apiUrl, mainsData, retryCount]);
 
 
   // Функция для загрузки продуктов из API с пагинацией
@@ -138,53 +289,65 @@ function App() {
       console.error('❌ [App] Ошибка загрузки продуктов:', error);
       return { products: [], nextPageToken: null };
     }
-  }, [api, locale]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [locale, selectedStore]);
 
   // Функция для оформления заказа
   const handleCheckout = async () => {
-    if (cart.length === 0) return;
+    if (cart.length === 0 || !cartId) {
+      console.warn('⚠️ [App] Корзина пуста или не создана');
+      return;
+    }
     
+    // TODO: В реальном приложении нужно получить координаты пользователя
+    // Для примера используем фиктивные координаты
     const orderData = {
-      items: cart.map(item => ({
-        productId: item.id,
-        quantity: item.quantity,
-        price: item.price
-      })),
-      totalAmount: getTotalPrice(),
-      timestamp: new Date().toISOString(),
-      store: selectedStore ? {
-        id: selectedStore.id,
-        name: selectedStore.name,
-        address: selectedStore.address
-      } : null
+      position: {
+        lat: 55.751244,
+        lon: 37.618423
+      },
+      cart_id: cartId,
+      cart_version: cartVersion
     };
 
     try {
+      console.log('📦 [App] Создаём заказ:', orderData);
       const result = await api.submitOrder(orderData);
       setOrderStatus('Заказ создан');
+      
+      // После создания заказа очищаем корзину
       setCart([]);
-      console.log('Order created:', result);
+      setCartId(null);
+      setCartVersion(null);
+      
+      console.log('✅ [App] Заказ создан:', result);
     } catch (error) {
-      console.error('Failed to create order:', error);
+      console.error('❌ [App] Ошибка создания заказа:', error);
       setOrderStatus('Ошибка создания заказа');
     }
   };
 
-  // Загружаем главную страницу при изменении настроек API
+  // Загружаем корзину и главную страницу при выборе склада
   useEffect(() => {
     if (apiUrl && selectedStore) {
+      // Загружаем корзину при выборе склада
+      console.log('🔄 [App] useEffect: Склад выбран, загружаем корзину');
+      loadCart();
+      
       // Загружаем главную страницу при выборе склада (только если еще не загружена)
       if (!mainsData) {
         console.log('🔄 [App] useEffect: Запускаем загрузку главной страницы');
         loadMains();
       }
     }
-  }, [apiUrl, selectedStore, loadMains, mainsData]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [apiUrl, selectedStore, mainsData]);
 
   // Функция для повторной попытки загрузки
   const handleRetry = useCallback(() => {
     console.log('🔄 [App] Пользователь запросил повторную попытку загрузки');
     setMainsData(null);
+    setMainsError(null);
     setRetryCount(prev => prev + 1);
   }, []);
 
@@ -194,7 +357,11 @@ function App() {
     setSelectedStore(store);
     // Сбрасываем данные при смене склада
     setMainsData(null);
+    setMainsError(null);
     setRetryCount(0);
+    setCart([]);
+    setCartId(null);
+    setCartVersion(null);
     // Возвращаемся к главной странице
     setCurrentView('main');
     setSelectedCategory(null);
@@ -225,7 +392,8 @@ function App() {
       console.error('❌ [App] Ошибка загрузки продуктов:', error);
       throw error;
     }
-  }, [api, locale, selectedStore]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [locale, selectedStore]);
 
   return (
     <div className="app">
@@ -249,8 +417,8 @@ function App() {
             onAddToCart={addToCart}
             onCategoryClick={handleCategoryClick}
             onLoadProducts={loadProducts}
-            loading={api.loading}
-            error={api.error}
+            loading={mainsLoading}
+            error={mainsError}
             selectedStore={selectedStore}
             useRealApi={true}
             onRetry={handleRetry}
