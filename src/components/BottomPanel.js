@@ -120,7 +120,7 @@ function BottomPanel({
                   className="api-url-input"
                 />
                   <p className="setting-description">
-                    Укажите адрес API сервера для получения данных о продуктах и заказах
+                    Адрес API сервера для получения данных о продуктах и заказах. Сохраняется в localStorage.
                   </p>
               </div>
               
@@ -135,7 +135,7 @@ function BottomPanel({
                     className="auth-token-input"
                   />
                   <p className="setting-description">
-                    Токен для авторизации запросов к API (будет добавлен в заголовок Authorization)
+                    Токен для авторизации запросов к API. Автоматически добавляется как заголовок <code>Authorization: Bearer &lt;token&gt;</code> ко всем запросам. Сохраняется в localStorage.
                   </p>
                 </div>
 
@@ -154,7 +154,7 @@ function BottomPanel({
                   <option value="de">Deutsch (de)</option>
                 </select>
                 <p className="setting-description">
-                  Язык для запросов к API (формат: двухбуквенный код языка)
+                  Язык для запросов к API (двухбуквенный код). Сохраняется в localStorage.
                 </p>
               </div>
 

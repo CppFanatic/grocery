@@ -8,6 +8,14 @@ components:
             schema:
                 type: string
                 maxLength: 128
+        AuthorizationHeader:
+            in: header
+            name: Authorization
+            description: an Authorization header with the Bearer authentication scheme.
+            required: true
+            schema:
+                type: string
+                pattern: '^Bearer \S+$'
 
     schemas:
         EmptyRequest:

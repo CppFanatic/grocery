@@ -8,6 +8,8 @@ paths:
         post:
             summary: Get all stores
             description: Shows detailed stores' information.
+            parameters:
+              - $ref: '../definitions.yaml#/components/parameters/AuthorizationHeader'
             requestBody:
                 required: true
                 content:

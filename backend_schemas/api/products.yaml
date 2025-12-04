@@ -7,6 +7,8 @@ paths:
     /b2b/v1/front/products/list:
         post:
             summary: Get products list
+            parameters:
+              - $ref: '../definitions.yaml#/components/parameters/AuthorizationHeader'
             requestBody:
                 required: true
                 content:

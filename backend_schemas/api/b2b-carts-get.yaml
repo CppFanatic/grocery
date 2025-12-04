@@ -9,6 +9,8 @@ paths:
             summary: Get cart
             description: Get cart by ID. If cart ID is ommitted, then current cart
                 of the user will be returned.
+            parameters:
+              - $ref: '../definitions.yaml#/components/parameters/AuthorizationHeader'
             requestBody:
                 required: true
                 content:

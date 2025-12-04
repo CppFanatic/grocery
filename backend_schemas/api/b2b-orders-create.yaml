@@ -10,6 +10,7 @@ paths:
             description: Create order by specifying previously created cart
             parameters:
               - $ref: '../definitions.yaml#/components/parameters/IdempotencyHeader'
+              - $ref: '../definitions.yaml#/components/parameters/AuthorizationHeader'
             requestBody:
                 required: true
                 content:

@@ -8,19 +8,39 @@ import './App.css';
 const CategoryView = lazy(() => import('./components/CategoryView'));
 const BottomPanel = lazy(() => import('./components/BottomPanel'));
 
+// Helper functions for localStorage
+const getStoredValue = (key, defaultValue) => {
+  try {
+    const stored = localStorage.getItem(key);
+    return stored !== null ? stored : defaultValue;
+  } catch (e) {
+    console.warn(`⚠️ [App] Ошибка чтения из localStorage (${key}):`, e);
+    return defaultValue;
+  }
+};
+
+const setStoredValue = (key, value) => {
+  try {
+    localStorage.setItem(key, value);
+  } catch (e) {
+    console.warn(`⚠️ [App] Ошибка записи в localStorage (${key}):`, e);
+  }
+};
+
 function App() {
   const [cart, setCart] = useState([]); // Local cache of server cart
   const [cartId, setCartId] = useState(null); // Server cart ID
   const [cartVersion, setCartVersion] = useState(null); // Server cart version for optimistic concurrency
   const [orderStatus, setOrderStatus] = useState('Нет заказов');
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [apiUrl, setApiUrl] = useState('http://localhost:3005');
-  const [authToken, setAuthToken] = useState('');
+  // Load settings from localStorage on init
+  const [apiUrl, setApiUrl] = useState(() => getStoredValue('apiUrl', 'http://localhost:3005'));
+  const [authToken, setAuthToken] = useState(() => getStoredValue('authToken', ''));
   const [selectedStore, setSelectedStore] = useState(null);
   const [mainsData, setMainsData] = useState(null);
   const [mainsLoading, setMainsLoading] = useState(false); // Separate loading state for main view
   const [mainsError, setMainsError] = useState(null); // Separate error state for main view
-  const [locale, setLocale] = useState('en');
+  const [locale, setLocale] = useState(() => getStoredValue('locale', 'en'));
   const [retryCount, setRetryCount] = useState(0);
   const [currentView, setCurrentView] = useState('main'); // 'main' or 'category'
   const [selectedCategory, setSelectedCategory] = useState(null);
@@ -34,6 +54,19 @@ function App() {
     cartIdRef.current = cartId;
     cartVersionRef.current = cartVersion;
   }, [cartId, cartVersion]);
+
+  // Persist settings to localStorage when they change
+  useEffect(() => {
+    setStoredValue('apiUrl', apiUrl);
+  }, [apiUrl]);
+
+  useEffect(() => {
+    setStoredValue('authToken', authToken);
+  }, [authToken]);
+
+  useEffect(() => {
+    setStoredValue('locale', locale);
+  }, [locale]);
 
   // Инициализируем API хук
   const api = useApi(apiUrl, authToken);

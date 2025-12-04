@@ -8,6 +8,8 @@ paths:
         post:
             summary: Get current main catalogue
             description: Get current main catalogue
+            parameters:
+              - $ref: '../definitions.yaml#/components/parameters/AuthorizationHeader'
             requestBody:
                 required: true
                 content:
