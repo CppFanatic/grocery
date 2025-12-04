@@ -31,7 +31,7 @@ function App() {
   const [cart, setCart] = useState([]); // Local cache of server cart
   const [cartId, setCartId] = useState(null); // Server cart ID
   const [cartVersion, setCartVersion] = useState(null); // Server cart version for optimistic concurrency
-  const [orderStatus, setOrderStatus] = useState('Нет заказов');
+  const [orderStatus, setOrderStatus] = useState('No orders');
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   // Load settings from localStorage on init
   const [apiUrl, setApiUrl] = useState(() => getStoredValue('apiUrl', 'http://localhost:3005'));
@@ -346,7 +346,7 @@ function App() {
     try {
       console.log('📦 [App] Создаём заказ:', orderData);
       const result = await api.submitOrder(orderData);
-      setOrderStatus('Заказ создан');
+      setOrderStatus('Order created');
       
       // После создания заказа очищаем корзину
       setCart([]);
@@ -356,7 +356,7 @@ function App() {
       console.log('✅ [App] Заказ создан:', result);
     } catch (error) {
       console.error('❌ [App] Ошибка создания заказа:', error);
-      setOrderStatus('Ошибка создания заказа');
+      setOrderStatus('Order creation error');
     }
   };
 
@@ -458,7 +458,7 @@ function App() {
             retryCount={retryCount}
           />
         ) : (
-          <Suspense fallback={<div className="loading-fallback">Загрузка...</div>}>
+          <Suspense fallback={<div className="loading-fallback">Loading...</div>}>
             <CategoryView
               category={selectedCategory}
               onAddToCart={addToCart}
@@ -472,7 +472,7 @@ function App() {
         )}
       </main>
       
-      <Suspense fallback={<div className="loading-fallback">Загрузка панели...</div>}>
+      <Suspense fallback={<div className="loading-fallback">Loading panel...</div>}>
         <BottomPanel 
           cart={cart}
           orderStatus={orderStatus}

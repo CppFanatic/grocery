@@ -23,11 +23,11 @@ function BottomPanel({
 
   const getOrderStatusIcon = () => {
     switch (orderStatus) {
-      case 'Готовится':
+      case 'Preparing':
         return '👨‍🍳';
-      case 'В пути':
+      case 'On the way':
         return '🚗';
-      case 'Доставлен':
+      case 'Delivered':
         return '✅';
       default:
         return '📦';
@@ -39,7 +39,7 @@ function BottomPanel({
       <div className="bottom-panel">
         <div className="panel-item" onClick={() => setShowCart(true)}>
           <div className="icon">🛒</div>
-          <span className="label">Корзина</span>
+          <span className="label">Cart</span>
           {totalItems > 0 && <span className="badge">{totalItems}</span>}
         </div>
         
@@ -50,12 +50,12 @@ function BottomPanel({
         
         <div className="panel-item" onClick={onLogin}>
           <div className="icon">{isLoggedIn ? '👤' : '🔐'}</div>
-          <span className="label">{isLoggedIn ? 'Профиль' : 'Войти'}</span>
+          <span className="label">{isLoggedIn ? 'Profile' : 'Sign In'}</span>
         </div>
         
         <div className="panel-item" onClick={() => setShowSettings(true)}>
           <div className="icon">⚙️</div>
-          <span className="label">Настройки</span>
+          <span className="label">Settings</span>
         </div>
       </div>
 
@@ -63,19 +63,19 @@ function BottomPanel({
         <div className="cart-modal">
           <div className="cart-content">
             <div className="cart-header">
-              <h2>Корзина</h2>
+              <h2>Cart</h2>
               <button className="close-btn" onClick={() => setShowCart(false)}>×</button>
             </div>
             
             <div className="cart-items">
               {cart.length === 0 ? (
-                <p className="empty-cart">Корзина пуста</p>
+                <p className="empty-cart">Cart is empty</p>
               ) : (
                 cart.map(item => (
                   <div key={item.id} className="cart-item">
                     <div className="item-info">
                       <h4>{item.name}</h4>
-                      <p>{item.price} ₽</p>
+                      <p>${item.price}</p>
                     </div>
                     <div className="item-controls">
                       <button onClick={() => onUpdateQuantity(item.id, item.quantity - 1)}>-</button>
@@ -91,9 +91,9 @@ function BottomPanel({
             {cart.length > 0 && (
               <div className="cart-footer">
                 <div className="total">
-                  <strong>Итого: {totalPrice} ₽</strong>
+                  <strong>Total: ${totalPrice}</strong>
                 </div>
-                <button className="checkout-btn" onClick={onCheckout}>Оформить заказ</button>
+                <button className="checkout-btn" onClick={onCheckout}>Checkout</button>
               </div>
             )}
           </div>
@@ -104,13 +104,13 @@ function BottomPanel({
         <div className="settings-modal">
           <div className="settings-content">
             <div className="settings-header">
-              <h2>Настройки</h2>
+              <h2>Settings</h2>
               <button className="close-btn" onClick={() => setShowSettings(false)}>×</button>
             </div>
             
             <div className="settings-body">
               <div className="setting-item">
-                <label htmlFor="apiUrl">URL API бекенда:</label>
+                <label htmlFor="apiUrl">Backend API URL:</label>
                 <input
                   id="apiUrl"
                   type="url"
@@ -120,27 +120,27 @@ function BottomPanel({
                   className="api-url-input"
                 />
                   <p className="setting-description">
-                    Адрес API сервера для получения данных о продуктах и заказах. Сохраняется в localStorage.
+                    API server address for fetching product and order data. Saved to localStorage.
                   </p>
               </div>
               
                 <div className="setting-item">
-                  <label htmlFor="authToken">Токен авторизации:</label>
+                  <label htmlFor="authToken">Authorization Token:</label>
                   <input
                     id="authToken"
                     type="password"
                     value={authToken}
                     onChange={(e) => onAuthTokenChange(e.target.value)}
-                    placeholder="Введите токен авторизации"
+                    placeholder="Enter authorization token"
                     className="auth-token-input"
                   />
                   <p className="setting-description">
-                    Токен для авторизации запросов к API. Автоматически добавляется как заголовок <code>Authorization: Bearer &lt;token&gt;</code> ко всем запросам. Сохраняется в localStorage.
+                    Token for API request authorization. Automatically added as <code>Authorization: Bearer &lt;token&gt;</code> header to all requests. Saved to localStorage.
                   </p>
                 </div>
 
               <div className="setting-item">
-                <label htmlFor="locale">Локаль:</label>
+                <label htmlFor="locale">Locale:</label>
                 <select
                   id="locale"
                   value={locale}
@@ -154,7 +154,7 @@ function BottomPanel({
                   <option value="de">Deutsch (de)</option>
                 </select>
                 <p className="setting-description">
-                  Язык для запросов к API (двухбуквенный код). Сохраняется в localStorage.
+                  Language for API requests (two-letter code). Saved to localStorage.
                 </p>
               </div>
 
@@ -165,7 +165,7 @@ function BottomPanel({
                   className="save-btn"
                   onClick={() => setShowSettings(false)}
                 >
-                  Сохранить
+                  Save
                 </button>
             </div>
           </div>

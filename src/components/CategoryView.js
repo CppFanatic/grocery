@@ -103,9 +103,9 @@ const CategoryView = ({
     return (
       <div className="category-view">
         <div className="category-view__error">
-          <p>Категория не найдена</p>
+          <p>Category not found</p>
           <button onClick={onBack} className="back-button">
-            ← Назад
+            ← Back
           </button>
         </div>
       </div>
@@ -116,7 +116,7 @@ const CategoryView = ({
     <div className="category-view">
       <div className="category-view__header">
         <button onClick={onBack} className="back-button">
-          ← Назад
+          ← Back
         </button>
         <div className="category-view__title">
           <h1>{category.title}</h1>
@@ -128,16 +128,16 @@ const CategoryView = ({
 
       {error && (
         <div className="category-view__error">
-          <p>Ошибка загрузки: {error}</p>
+          <p>Loading error: {error}</p>
           <button onClick={() => loadProducts()} className="retry-button">
-            Повторить
+            Retry
           </button>
         </div>
       )}
 
       {loading && products.length === 0 ? (
         <div className="category-view__loading">
-          <p>Загрузка продуктов...</p>
+          <p>Loading products...</p>
         </div>
       ) : (
         <div className="category-view__content">
@@ -153,22 +153,22 @@ const CategoryView = ({
                 ))}
               </div>
               
-              {/* Элемент для отслеживания видимости для ленивой загрузки */}
+              {/* Element for visibility tracking for lazy loading */}
               {hasMore && (
                 <div ref={loadingRef} className="loading-trigger">
-                  {loadingMore && <p>Загрузка дополнительных продуктов...</p>}
+                  {loadingMore && <p>Loading more products...</p>}
                 </div>
               )}
               
               {!hasMore && products.length > 0 && (
                 <div className="no-more-products">
-                  <p>Все продукты загружены</p>
+                  <p>All products loaded</p>
                 </div>
               )}
             </>
           ) : (
             <div className="no-products">
-              <p>В этой категории пока нет продуктов</p>
+              <p>No products in this category yet</p>
             </div>
           )}
         </div>

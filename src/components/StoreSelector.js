@@ -19,13 +19,13 @@ function StoreSelector({ selectedStore, onStoreSelect, apiUrl, authToken }) {
 
   const api = useApi(apiUrl, authToken);
 
-  // Функция для форматирования расписания работы склада
+  // Function to format store working hours
   const formatStoreSchedule = (schedule) => {
     if (!Array.isArray(schedule) || schedule.length === 0) {
-      return 'Часы работы не указаны';
+      return 'Working hours not specified';
     }
 
-    // Ищем расписание для будних дней
+    // Look for workday schedule
     const workdaySchedule = schedule.find(item => item.type === 'workday');
     const everydaySchedule = schedule.find(item => item.type === 'everyday');
     
@@ -35,7 +35,7 @@ function StoreSelector({ selectedStore, onStoreSelect, apiUrl, authToken }) {
       return `${scheduleToUse.open_time} - ${scheduleToUse.close_time}`;
     }
     
-    return 'Часы работы не указаны';
+    return 'Working hours not specified';
   };
 
   // Загружаем список складов
@@ -87,7 +87,7 @@ function StoreSelector({ selectedStore, onStoreSelect, apiUrl, authToken }) {
               lon: store.location.lon
             } : null,
             working_hours: store.store_schedule ? 
-              formatStoreSchedule(store.store_schedule) : 'Часы работы не указаны',
+              formatStoreSchedule(store.store_schedule) : 'Working hours not specified',
             status: store.status || 'unknown',
             timezone: store.timezone || null,
             // Дополнительные поля из схемы
@@ -108,23 +108,23 @@ function StoreSelector({ selectedStore, onStoreSelect, apiUrl, authToken }) {
       console.error('❌ [StoreSelector] Тип ошибки:', err.constructor.name);
       console.error('❌ [StoreSelector] Сообщение ошибки:', err.message);
       
-      // Детальная обработка различных типов ошибок
-      let errorMessage = 'Ошибка загрузки складов';
+      // Detailed error handling
+      let errorMessage = 'Error loading stores';
       
       if (err.isTimeoutError || err.message.includes('превысил время ожидания')) {
-        errorMessage = 'Запрос превысил время ожидания (30 секунд). Сервер может быть недоступен или медленно отвечает. Попробуйте еще раз.';
+        errorMessage = 'Request timed out (30 seconds). Server may be unavailable or slow to respond. Please try again.';
       } else if (err.isCorsError || err.message.includes('CORS')) {
-        errorMessage = 'Ошибка CORS: Сервер не разрешает запросы с локального домена. Попробуйте использовать прокси или настройте CORS на сервере.';
+        errorMessage = 'CORS error: Server does not allow requests from local domain. Try using a proxy or configure CORS on the server.';
       } else if (err.message.includes('404')) {
-        errorMessage = 'Склады не найдены (404). Проверьте правильность API endpoint.';
+        errorMessage = 'Stores not found (404). Check the API endpoint.';
       } else if (err.message.includes('401') || err.message.includes('403')) {
-        errorMessage = 'Ошибка авторизации: проверьте токен авторизации.';
+        errorMessage = 'Authorization error: check your authorization token.';
       } else if (err.message.includes('Network') || err.message.includes('Failed to fetch')) {
-        errorMessage = 'Сетевая ошибка: не удается подключиться к серверу. Проверьте URL и доступность сервера.';
+        errorMessage = 'Network error: unable to connect to server. Check the URL and server availability.';
       } else if (err.message.includes('500')) {
-        errorMessage = 'Внутренняя ошибка сервера (500).';
+        errorMessage = 'Internal server error (500).';
       } else {
-        errorMessage = err.message || 'Неизвестная ошибка при загрузке складов';
+        errorMessage = err.message || 'Unknown error loading stores';
       }
       
       setError(errorMessage);
@@ -184,20 +184,20 @@ function StoreSelector({ selectedStore, onStoreSelect, apiUrl, authToken }) {
       <div className="store-selector">
         <div className="store-info">
           <div className="store-name">
-            {selectedStore ? selectedStore.name : 'Склад не выбран'}
+            {selectedStore ? selectedStore.name : 'No store selected'}
           </div>
           <div className="store-address">
-            {selectedStore ? selectedStore.address : 'Выберите склад для доставки'}
+            {selectedStore ? selectedStore.address : 'Select a store for delivery'}
           </div>
         </div>
         <button 
           className="select-store-btn"
           onClick={() => {
-            console.log('🖱️ [StoreSelector] Нажата кнопка "Выбрать склад"');
+            console.log('🖱️ [StoreSelector] "Select store" button clicked');
             setShowStoreList(true);
           }}
         >
-          Выбрать склад
+          Select Store
         </button>
       </div>
 
@@ -205,7 +205,7 @@ function StoreSelector({ selectedStore, onStoreSelect, apiUrl, authToken }) {
         <div className="store-list-modal">
           <div className="store-list-content">
             <div className="store-list-header">
-              <h2>Выберите склад</h2>
+              <h2>Select a Store</h2>
               <button 
                 className="close-btn" 
                 onClick={() => setShowStoreList(false)}
@@ -218,9 +218,9 @@ function StoreSelector({ selectedStore, onStoreSelect, apiUrl, authToken }) {
               {(api.loading || isRequestInProgress) && (
                 <div className="loading-state">
                   <div className="loading-spinner"></div>
-                  <p>Загрузка складов...</p>
+                  <p>Loading stores...</p>
                   {isRequestInProgress && (
-                    <p className="loading-timeout-info">Максимальное время ожидания: 30 секунд</p>
+                    <p className="loading-timeout-info">Maximum wait time: 30 seconds</p>
                   )}
                 </div>
               )}
@@ -228,25 +228,25 @@ function StoreSelector({ selectedStore, onStoreSelect, apiUrl, authToken }) {
               {error && (
                 <div className="error-state">
                   <div className="error-icon">⚠️</div>
-                  <p>Ошибка загрузки: {error}</p>
+                  <p>Loading error: {error}</p>
                   <button 
                     className="retry-button"
                     onClick={() => {
-                      console.log('🔄 [StoreSelector] Повторная попытка загрузки складов');
+                      console.log('🔄 [StoreSelector] Retrying store loading');
                       setError(null);
                       setIsRequestInProgress(false);
                       loadStores();
                     }}
                     disabled={api.loading || isRequestInProgress}
                   >
-                    {(api.loading || isRequestInProgress) ? 'Загрузка...' : 'Повторить попытку'}
+                    {(api.loading || isRequestInProgress) ? 'Loading...' : 'Retry'}
                   </button>
                 </div>
               )}
               
               {!api.loading && !error && stores.length === 0 && (
                 <div className="empty-state">
-                  <p>Склады не найдены</p>
+                  <p>No stores found</p>
                 </div>
               )}
               
@@ -267,12 +267,12 @@ function StoreSelector({ selectedStore, onStoreSelect, apiUrl, authToken }) {
                       <div className="store-item-address">{store.address}</div>
                       {store.working_hours && (
                         <div className="store-item-hours">
-                          Часы работы: {store.working_hours}
+                          Working hours: {store.working_hours}
                         </div>
                       )}
                       {store.phone && (
                         <div className="store-item-phone">
-                          Телефон: {store.phone}
+                          Phone: {store.phone}
                         </div>
                       )}
                     </div>

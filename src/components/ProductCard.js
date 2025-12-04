@@ -15,9 +15,9 @@ function ProductCard({ product, onAddToCart }) {
         <h3 className="product-name">{product.title}</h3>
         <p className="product-description">{product.description}</p>
         <div className="product-footer">
-          <span className="product-price">{product.price} ₽</span>
+          <span className="product-price">${product.price}</span>
           <button className="add-to-cart-btn" onClick={handleAddToCart}>
-            Добавить
+            Add
           </button>
         </div>
       </div>

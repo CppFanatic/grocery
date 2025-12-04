@@ -131,7 +131,7 @@ const CarouselWidget = ({ widget, products = [], onAddToCart, onCategoryClick, l
             className="carousel-widget__button carousel-widget__button--prev"
             onClick={goToPrevious}
             disabled={!canGoPrevious}
-            aria-label="Предыдущие продукты"
+            aria-label="Previous products"
           >
             ‹
           </button>
@@ -139,7 +139,7 @@ const CarouselWidget = ({ widget, products = [], onAddToCart, onCategoryClick, l
             className="carousel-widget__button carousel-widget__button--next"
             onClick={goToNext}
             disabled={!canGoNext}
-            aria-label="Следующие продукты"
+            aria-label="Next products"
           >
             ›
           </button>
@@ -162,7 +162,7 @@ const CarouselWidget = ({ widget, products = [], onAddToCart, onCategoryClick, l
           {loading ? (
             <div className="carousel-widget__loading">
               <div className="carousel-widget__loading-spinner"></div>
-              <p>Загрузка продуктов...</p>
+              <p>Loading products...</p>
             </div>
           ) : limitedProducts.length > 0 ? (
             <>
@@ -178,7 +178,7 @@ const CarouselWidget = ({ widget, products = [], onAddToCart, onCategoryClick, l
                   />
                 </div>
               ))}
-              {/* Карточка "Смотреть все" */}
+              {/* "View all" card */}
               <div 
                 className="carousel-widget__item"
                 style={{ width: `${100 / totalItems}%` }}
@@ -195,14 +195,14 @@ const CarouselWidget = ({ widget, products = [], onAddToCart, onCategoryClick, l
                   }}
                 >
                   <div className="carousel-widget__view-all-icon">→</div>
-                  <h3 className="carousel-widget__view-all-title">Смотреть все</h3>
-                  <p className="carousel-widget__view-all-subtitle">Перейти в категорию</p>
+                  <h3 className="carousel-widget__view-all-title">View All</h3>
+                  <p className="carousel-widget__view-all-subtitle">Go to category</p>
                 </div>
               </div>
             </>
           ) : (
             <div className="carousel-widget__empty">
-              <p>Продукты не найдены</p>
+              <p>No products found</p>
             </div>
           )}
         </div>
@@ -215,7 +215,7 @@ const CarouselWidget = ({ widget, products = [], onAddToCart, onCategoryClick, l
               key={index}
               className={`carousel-widget__indicator ${index === currentIndex ? 'carousel-widget__indicator--active' : ''}`}
               onClick={() => setCurrentIndex(index)}
-              aria-label={`Перейти к слайду ${index + 1}`}
+              aria-label={`Go to slide ${index + 1}`}
             />
           ))}
         </div>

@@ -127,7 +127,7 @@ const MainView = ({
     return (
       <div className="main-view main-view--loading">
         <div className="main-view__spinner"></div>
-        <p>Загрузка главной страницы...</p>
+        <p>Loading main page...</p>
       </div>
     );
   }
@@ -136,11 +136,11 @@ const MainView = ({
     return (
       <div className="main-view main-view--error">
         <div className="main-view__error-icon">⚠️</div>
-        <h3>Ошибка загрузки</h3>
+        <h3>Loading Error</h3>
         <p>{error}</p>
         {retryCount > 0 && (
           <p className="main-view__retry-info">
-            Попытка загрузки: {retryCount}
+            Loading attempt: {retryCount}
           </p>
         )}
         {onRetry && (
@@ -148,7 +148,7 @@ const MainView = ({
             className="main-view__retry-button"
             onClick={onRetry}
           >
-            Попробовать снова
+            Try again
           </button>
         )}
       </div>
@@ -159,14 +159,14 @@ const MainView = ({
     return (
       <div className="main-view main-view--empty">
         <div className="main-view__empty-icon">📭</div>
-        <h3>Нет данных</h3>
-        <p>Главная страница пуста или данные не загружены</p>
+        <h3>No Data</h3>
+        <p>Main page is empty or data not loaded</p>
         {!loading && onRetry && (
           <button 
             className="main-view__retry-button"
             onClick={onRetry}
           >
-            Загрузить данные
+            Load Data
           </button>
         )}
       </div>
