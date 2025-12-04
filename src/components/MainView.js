@@ -1,6 +1,7 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import GroupWidget from './GroupWidget';
 import CarouselWidget from './CarouselWidget';
+import RadialCarousel from './RadialCarousel';
 import './MainView.css';
 
 /**
@@ -30,6 +31,19 @@ const MainView = ({
 }) => {
   const [carouselProducts, setCarouselProducts] = useState({});
   const [carouselLoading, setCarouselLoading] = useState({});
+  const [radialSize, setRadialSize] = useState(320);
+
+  // Update radial carousel size based on window width
+  useEffect(() => {
+    const updateSize = () => {
+      const maxSize = Math.min(320, window.innerWidth - 40);
+      setRadialSize(maxSize);
+    };
+    
+    updateSize();
+    window.addEventListener('resize', updateSize);
+    return () => window.removeEventListener('resize', updateSize);
+  }, []);
 
   // Функция для загрузки продуктов для карусели
   const loadCarouselProducts = useCallback(async (categoryId) => {
@@ -80,6 +94,26 @@ const MainView = ({
       onCategoryClick(category);
     }
   }, [onCategoryClick]);
+
+  // Extract all categories from group widgets for the radial carousel
+  const allCategories = useMemo(() => {
+    if (!mainsData || !mainsData.widgets) return [];
+    
+    const categories = [];
+    mainsData.widgets.forEach(widget => {
+      if (widget.type === 'group' && widget.categories) {
+        categories.push(...widget.categories);
+      }
+    });
+    
+    // Return unique categories (by id) - the radial carousel handles large datasets internally
+    const uniqueCategories = categories.filter((cat, index, self) => 
+      index === self.findIndex(c => c.id === cat.id)
+    );
+    
+    console.log('🎡 [MainView] Categories for radial carousel:', uniqueCategories.length);
+    return uniqueCategories;
+  }, [mainsData]);
 
   // Обработчик добавления в корзину
   const handleAddToCart = useCallback((product) => {
@@ -149,6 +183,19 @@ const MainView = ({
           <p className="main-view__id">ID: {mainsData.id}</p>
         </div>
       )} */}
+      
+      {/* Radial Carousel for category navigation */}
+      {allCategories.length > 0 && (
+        <div className="main-view__radial-section">
+          <h2 className="main-view__radial-title">Explore Categories</h2>
+          <p className="main-view__radial-subtitle">Spin the wheel to discover</p>
+          <RadialCarousel
+            categories={allCategories}
+            onCategoryClick={handleCategoryClick}
+            size={radialSize}
+          />
+        </div>
+      )}
       
       <div className="main-view__widgets">
         {mainsData.widgets.map((widget, index) => {
