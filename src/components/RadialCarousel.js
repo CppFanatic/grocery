@@ -246,17 +246,6 @@ const RadialCarousel = ({ categories = [], onCategoryClick, size = 320 }) => {
         </div>
       </div>
       
-      {/* STATIC Dead zone mask at bottom (sector 0) */}
-      <div className="radial-carousel__dead-zone">
-        <div className="radial-carousel__dead-zone-mask" />
-        <div className="radial-carousel__dead-zone-gradient" />
-      </div>
-      
-      {/* Top indicator arrow (points to sector 4) */}
-      <div className="radial-carousel__indicator">
-        <div className="radial-carousel__indicator-arrow" />
-      </div>
-      
       {/* Navigation buttons */}
       <button 
         className="radial-carousel__nav-btn radial-carousel__nav-btn--left"
@@ -266,7 +255,9 @@ const RadialCarousel = ({ categories = [], onCategoryClick, size = 320 }) => {
         type="button"
       >
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-          <polyline points="15 18 9 12 15 6" />
+          {/* Counter-clockwise rotation arrow */}
+          <path d="M4 12a8 8 0 0 1 14.5-4.5" />
+          <polyline points="4 4 4 12 12 12" />
         </svg>
       </button>
       
@@ -278,7 +269,9 @@ const RadialCarousel = ({ categories = [], onCategoryClick, size = 320 }) => {
         type="button"
       >
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-          <polyline points="9 18 15 12 9 6" />
+          {/* Clockwise rotation arrow */}
+          <path d="M20 12a8 8 0 0 0-14.5-4.5" />
+          <polyline points="20 4 20 12 12 12" />
         </svg>
       </button>
       
