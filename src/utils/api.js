@@ -222,8 +222,9 @@ export const fetchStores = async (baseUrl, authToken) => {
   console.log('⏰ [fetchStores] Установлен timeout: 30 секунд');
   
   try {
-    const result = await apiRequest('/b2b/v1/stores/get', baseUrl, authToken, {
-      method: 'POST'
+    const result = await apiRequest('/b2b/v1/front/stores/get', baseUrl, authToken, {
+      method: 'POST',
+      body: JSON.stringify({})
     });
     
     console.log('✅ [fetchStores] Запрос успешно завершен');
