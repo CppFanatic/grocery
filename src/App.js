@@ -31,7 +31,7 @@ function App() {
   const [cart, setCart] = useState([]); // Local cache of server cart
   const [cartId, setCartId] = useState(null); // Server cart ID
   const [cartVersion, setCartVersion] = useState(null); // Server cart version for optimistic concurrency
-  const [orderStatus, setOrderStatus] = useState('No orders');
+  const [checkoutSuccess, setCheckoutSuccess] = useState(null); // Timestamp of last successful checkout
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   // Load settings from localStorage on init
   const [apiUrl, setApiUrl] = useState(() => getStoredValue('apiUrl', 'http://localhost:3005'));
@@ -346,17 +346,18 @@ function App() {
     try {
       console.log('📦 [App] Создаём заказ:', orderData);
       const result = await api.submitOrder(orderData);
-      setOrderStatus('Order created');
       
       // После создания заказа очищаем корзину
       setCart([]);
       setCartId(null);
       setCartVersion(null);
       
+      // Trigger orders tracking fetch by updating checkoutSuccess timestamp
+      setCheckoutSuccess(Date.now());
+      
       console.log('✅ [App] Заказ создан:', result);
     } catch (error) {
       console.error('❌ [App] Ошибка создания заказа:', error);
-      setOrderStatus('Order creation error');
     }
   };
 
@@ -475,7 +476,6 @@ function App() {
       <Suspense fallback={<div className="loading-fallback">Loading panel...</div>}>
         <BottomPanel 
           cart={cart}
-          orderStatus={orderStatus}
           isLoggedIn={isLoggedIn}
           onLogin={() => setIsLoggedIn(!isLoggedIn)}
           onUpdateQuantity={updateQuantity}
@@ -489,6 +489,7 @@ function App() {
           onCheckout={handleCheckout}
           locale={locale}
           onLocaleChange={setLocale}
+          checkoutSuccess={checkoutSuccess}
         />
       </Suspense>
     </div>

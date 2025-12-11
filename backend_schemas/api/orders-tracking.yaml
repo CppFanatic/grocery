@@ -1,0 +1,84 @@
+openapi: 3.0.0
+info:
+    version: '1.0'
+
+
+paths:
+    /b2b/v1/front/orders-tracking/get:
+        post:
+            summary: Get orders tracking info
+            description: Get orders information for tracking. Returns active orders and specified order information.
+            parameters:
+              - $ref: '../definitions.yaml#/components/parameters/AuthorizationHeader'
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/OrdersTrackingGetRequest'
+            responses:
+                '200':
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/OrdersTrackingGetResponse'
+components:
+    schemas:
+        OrdersTrackingGetRequest:
+            description: Orders tracking get request. If order_id is not specified, returns all active orders. If order_id is
+                specified, returns both active orders and specified order information.
+            type: object
+            additionalProperties: false
+            properties:
+                order_id:
+                    description: Order ID
+                    type: string
+
+        OrdersTrackingGetResponse:
+            description: Orders tracking get response.
+            type: array
+            items:
+                $ref: '#/components/schemas/OrdersTrackingOrderInfo'
+        OrdersTrackingOrderInfo:
+            description: Information about order.
+            type: object
+            additionalProperties: false
+            required:
+              - order_id
+              - state
+            properties:
+                order_id:
+                    description: Order ID
+                    type: string
+                state:
+                    description: Order state
+                    $ref: '#/components/schemas/OrderState'
+                courier_info:
+                    description: Courier info
+                    $ref: '#/components/schemas/CourierInfo'
+
+        OrderState:
+            description: Order state.
+            type: string
+            enum:
+              - created
+              - assembling
+              - assembled
+              - courier_assigned
+              - delivering
+              - delivery_arrived
+              - closed
+              - canceled
+
+        CourierInfo:
+            description: Courier info
+            type: object
+            additionalProperties: false
+            properties:
+                name:
+                    description: Courier name.
+                    type: string
+                position:
+                    description: Courier position.
+                    $ref: '../definitions.yaml#/components/schemas/Point'

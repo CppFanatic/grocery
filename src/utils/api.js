@@ -322,6 +322,27 @@ export const fetchCart = async (baseUrl, authToken, cartId = null) => {
 };
 
 /**
+ * Получает информацию о заказах для отслеживания
+ * @param {string} baseUrl - Базовый URL API
+ * @param {string} authToken - Токен авторизации
+ * @param {string|null} orderId - ID конкретного заказа (опционально)
+ * @returns {Promise<Array>} - Promise с массивом OrdersTrackingOrderInfo
+ */
+export const fetchOrdersTracking = async (baseUrl, authToken, orderId = null) => {
+  console.log('📋 [fetchOrdersTracking] Загружаем информацию о заказах, orderId:', orderId || 'all active');
+  
+  const requestBody = {};
+  if (orderId) {
+    requestBody.order_id = orderId;
+  }
+
+  return apiRequest('/b2b/v1/front/orders-tracking/get', baseUrl, authToken, {
+    method: 'POST',
+    body: JSON.stringify(requestBody)
+  });
+};
+
+/**
  * Создаёт или обновляет корзину
  * @param {string} baseUrl - Базовый URL API
  * @param {string} authToken - Токен авторизации

@@ -7,7 +7,8 @@ import {
   fetchMains,
   fetchProductsList,
   fetchCart,
-  setCart
+  setCart,
+  fetchOrdersTracking
 } from '../utils/api';
 
 /**
@@ -86,6 +87,11 @@ export const useApi = (baseUrl, authToken) => {
     return handleApiCall(setCart, cartData);
   }, [handleApiCall]);
 
+  const getOrdersTracking = useCallback((orderId = null) => {
+    console.log('📋 [useApi] Вызывается getOrdersTracking с orderId:', orderId || 'all active');
+    return handleApiCall(fetchOrdersTracking, orderId);
+  }, [handleApiCall]);
+
   // Memoize the return object to prevent unnecessary re-renders
   return useMemo(() => ({
     loading,
@@ -97,7 +103,8 @@ export const useApi = (baseUrl, authToken) => {
     getMains,
     getProductsList,
     getCart,
-    updateCart
+    updateCart,
+    getOrdersTracking
   }), [
     loading,
     error,
@@ -108,6 +115,7 @@ export const useApi = (baseUrl, authToken) => {
     getMains,
     getProductsList,
     getCart,
-    updateCart
+    updateCart,
+    getOrdersTracking
   ]);
 };
