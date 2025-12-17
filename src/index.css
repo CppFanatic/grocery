@@ -1,4 +1,4 @@
-/* Глобальные стили */
+/* Global styles */
 * {
   margin: 0;
   padding: 0;
@@ -22,7 +22,7 @@ body {
   flex-direction: column;
 }
 
-/* Утилиты */
+/* Utilities */
 .container {
   max-width: 1200px;
   margin: 0 auto;
@@ -62,7 +62,7 @@ body {
   box-shadow: 0 8px 25px rgba(240, 147, 251, 0.4);
 }
 
-/* Адаптивность */
+/* Responsiveness */
 @media (max-width: 768px) {
   .container {
     padding: 0 12px;
@@ -74,7 +74,7 @@ body {
   }
 }
 
-/* Анимации */
+/* Animations */
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -90,7 +90,7 @@ body {
   animation: fadeIn 0.3s ease-out;
 }
 
-/* Скроллбар */
+/* Scrollbar */
 ::-webkit-scrollbar {
   width: 8px;
 }

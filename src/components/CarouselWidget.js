@@ -3,16 +3,16 @@ import ProductCard from './ProductCard';
 import './CarouselWidget.css';
 
 /**
- * Компонент для отображения карусели продуктов
- * @param {Object} props - Свойства компонента
- * @param {Object} props.widget - Данные виджета карусели
- * @param {string} props.widget.category_id - ID категории
- * @param {string} props.widget.title - Заголовок карусели
- * @param {Array} props.products - Массив продуктов для отображения
- * @param {Function} props.onAddToCart - Обработчик добавления в корзину
- * @param {Function} props.onCategoryClick - Обработчик клика для перехода в категорию
- * @param {boolean} props.loading - Состояние загрузки
- * @returns {JSX.Element} - JSX элемент карусели продуктов
+ * Component for displaying product carousel
+ * @param {Object} props - Component properties
+ * @param {Object} props.widget - Carousel widget data
+ * @param {string} props.widget.category_id - Category ID
+ * @param {string} props.widget.title - Carousel title
+ * @param {Array} props.products - Array of products to display
+ * @param {Function} props.onAddToCart - Add to cart handler
+ * @param {Function} props.onCategoryClick - Click handler for navigating to category
+ * @param {boolean} props.loading - Loading state
+ * @returns {JSX.Element} - JSX element of product carousel
  */
 const CarouselWidget = ({ widget, products = [], onAddToCart, onCategoryClick, loading = false }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -22,13 +22,13 @@ const CarouselWidget = ({ widget, products = [], onAddToCart, onCategoryClick, l
   const [isDragging, setIsDragging] = useState(false);
   const [dragOffset, setDragOffset] = useState(0);
 
-  // Ограничиваем максимальное количество продуктов до 5
+  // Limit maximum number of products to 5
   const limitedProducts = products.slice(0, 5);
   
-  // Общее количество элементов включая карточку "Смотреть все"
+  // Total number of items including "View all" card
   const totalItems = limitedProducts.length + 1;
 
-  // Определяем количество элементов для отображения в зависимости от размера экрана
+  // Determine number of items to display based on screen size
   useEffect(() => {
     const updateItemsPerView = () => {
       if (window.innerWidth < 768) {
@@ -46,7 +46,7 @@ const CarouselWidget = ({ widget, products = [], onAddToCart, onCategoryClick, l
   }, []);
 
   if (!widget) {
-    console.warn('⚠️ [CarouselWidget] Некорректные данные виджета:', widget);
+    console.warn('⚠️ [CarouselWidget] Invalid widget data:', widget);
     return null;
   }
 
@@ -63,7 +63,7 @@ const CarouselWidget = ({ widget, products = [], onAddToCart, onCategoryClick, l
   const canGoPrevious = currentIndex > 0;
   const canGoNext = currentIndex < maxIndex;
 
-  // Обработчик клика по карточке "Смотреть все"
+  // "View all" card click handler
   const handleViewAllClick = () => {
     if (onCategoryClick) {
       onCategoryClick({
@@ -73,10 +73,10 @@ const CarouselWidget = ({ widget, products = [], onAddToCart, onCategoryClick, l
     }
   };
 
-  // Минимальное расстояние свайпа в пикселях для смены слайда
+  // Minimum swipe distance in pixels to change slide
   const minSwipeDistance = 50;
 
-  // Обработчики свайпа с плавным следованием за пальцем
+  // Swipe handlers with smooth finger-following
   const handleTouchStart = (e) => {
     setIsDragging(true);
     setTouchEnd(0);
@@ -90,12 +90,12 @@ const CarouselWidget = ({ widget, products = [], onAddToCart, onCategoryClick, l
     const currentTouch = e.targetTouches[0].clientX;
     setTouchEnd(currentTouch);
     
-    // Вычисляем смещение в процентах относительно ширины контейнера
+    // Calculate offset as percentage relative to container width
     const containerWidth = e.currentTarget.offsetWidth;
     const dragDistance = currentTouch - touchStart;
     const dragPercent = (dragDistance / containerWidth) * 100;
     
-    // Применяем смещение с учетом текущего индекса
+    // Apply offset considering current index
     setDragOffset(dragPercent);
   };
 
@@ -115,12 +115,12 @@ const CarouselWidget = ({ widget, products = [], onAddToCart, onCategoryClick, l
       goToPrevious();
     }
     
-    // Сбрасываем значения
+    // Reset values
     setTouchStart(0);
     setTouchEnd(0);
   };
 
-  console.log('🎠 [CarouselWidget] Рендерим карусель:', widget.title, 'с', limitedProducts.length, 'продуктами');
+  console.log('🎠 [CarouselWidget] Rendering carousel:', widget.title, 'with', limitedProducts.length, 'products');
 
   return (
     <div className="carousel-widget">

@@ -1,4 +1,4 @@
-/* Стили для выбора склада - Современный дизайн */
+/* Store selector styles - Modern design */
 .store-selector {
   background: rgba(255, 255, 255, 0.95);
   border-radius: 16px;
@@ -57,7 +57,7 @@
   transform: translateY(0);
 }
 
-/* Модальное окно списка складов */
+/* Store list modal */
 .store-list-modal {
   position: fixed;
   top: 0;
@@ -131,7 +131,7 @@
   padding: 0 20px;
 }
 
-/* Состояния загрузки и ошибки */
+/* Loading and error states */
 .loading-state,
 .error-state,
 .empty-state {
@@ -202,7 +202,7 @@
   box-shadow: none;
 }
 
-/* Список складов */
+/* Stores list */
 .stores-list {
   padding: 20px 0;
 }
@@ -270,7 +270,7 @@
   margin-bottom: 0;
 }
 
-/* Адаптивность */
+/* Responsiveness */
 @media (max-width: 768px) {
   .store-selector {
     margin: 0 12px 16px 12px;

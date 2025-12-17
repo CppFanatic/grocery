@@ -14,7 +14,7 @@ const getStoredValue = (key, defaultValue) => {
     const stored = localStorage.getItem(key);
     return stored !== null ? stored : defaultValue;
   } catch (e) {
-    console.warn(`⚠️ [App] Ошибка чтения из localStorage (${key}):`, e);
+    console.warn(`⚠️ [App] Error reading from localStorage (${key}):`, e);
     return defaultValue;
   }
 };
@@ -23,7 +23,7 @@ const setStoredValue = (key, value) => {
   try {
     localStorage.setItem(key, value);
   } catch (e) {
-    console.warn(`⚠️ [App] Ошибка записи в localStorage (${key}):`, e);
+    console.warn(`⚠️ [App] Error writing to localStorage (${key}):`, e);
   }
 };
 
@@ -68,30 +68,30 @@ function App() {
     setStoredValue('locale', locale);
   }, [locale]);
 
-  // Инициализируем API хук
+  // Initialize API hook
   const api = useApi(apiUrl, authToken);
 
-  // Загружает корзину с сервера
+  // Load cart from server
   const loadCart = useCallback(async () => {
     if (!selectedStore) {
-      console.log('🛒 [App] Склад не выбран, пропускаем загрузку корзины');
+      console.log('🛒 [App] No store selected, skipping cart loading');
       return;
     }
 
     try {
-      console.log('🛒 [App] Загружаем корзину с сервера...');
+      console.log('🛒 [App] Loading cart from server...');
       const response = await api.getCart();
       
       if (response && response.id) {
-        console.log('✅ [App] Корзина загружена:', response);
+        console.log('✅ [App] Cart loaded:', response);
         setCartId(response.id);
         setCartVersion(response.version);
         
-        // Преобразуем items из ResponseCartItem в формат для локального состояния
+        // Transform items from ResponseCartItem to local state format
         const cartItems = (response.items || []).map(item => ({
           id: item.id,
           title: item.title,
-          name: item.title, // Алиас для совместимости
+          name: item.title, // Alias for compatibility
           price: parseFloat(item.price),
           quantity: parseFloat(item.quantity),
           image_url: item.image_url
@@ -100,10 +100,10 @@ function App() {
         setCart(cartItems);
       }
     } catch (error) {
-      console.error('❌ [App] Ошибка загрузки корзины:', error);
-      // Если корзина не найдена (404), это нормально - создадим новую при первом добавлении
+      console.error('❌ [App] Error loading cart:', error);
+      // If cart not found (404), this is normal - will create new one on first add
       if (error.message && error.message.includes('404')) {
-        console.log('ℹ️ [App] Корзина не найдена, будет создана при добавлении товара');
+        console.log('ℹ️ [App] Cart not found, will be created when adding item');
         setCart([]);
         setCartId(null);
         setCartVersion(null);
@@ -112,27 +112,27 @@ function App() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedStore]);
 
-  // Синхронизирует корзину с сервером
+  // Synchronize cart with server
   const syncCart = useCallback(async (updatedCart) => {
     if (!selectedStore) {
-      console.warn('⚠️ [App] Склад не выбран, невозможно синхронизировать корзину');
+      console.warn('⚠️ [App] No store selected, cannot synchronize cart');
       return;
     }
 
     try {
-      console.log('🔄 [App] Синхронизируем корзину с сервером...');
+      console.log('🔄 [App] Synchronizing cart with server...');
       
-      // Формируем запрос согласно OpenAPI схеме
+      // Build request according to OpenAPI schema
       const cartData = {
         items: updatedCart.map(item => ({
           id: item.id,
           quantity: item.quantity
         })),
-        fulfillment_method: 'pickup', // Используем pickup т.к. у нас выбран склад
+        fulfillment_method: 'pickup', // Using pickup since we have a store selected
         store_id: selectedStore.id
       };
 
-      // Добавляем id и version если корзина уже существует (используем refs)
+      // Add id and version if cart already exists (using refs)
       if (cartIdRef.current) {
         cartData.id = cartIdRef.current;
         cartData.version = cartVersionRef.current;
@@ -141,11 +141,11 @@ function App() {
       const response = await api.updateCart(cartData);
       
       if (response && response.id) {
-        console.log('✅ [App] Корзина синхронизирована:', response);
+        console.log('✅ [App] Cart synchronized:', response);
         setCartId(response.id);
         setCartVersion(response.version);
         
-        // Обновляем локальное состояние из ответа сервера
+        // Update local state from server response
         const cartItems = (response.items || []).map(item => ({
           id: item.id,
           title: item.title,
@@ -158,17 +158,17 @@ function App() {
         setCart(cartItems);
       }
     } catch (error) {
-      console.error('❌ [App] Ошибка синхронизации корзины:', error);
-      // При ошибке откатываем к предыдущему состоянию
+      console.error('❌ [App] Error synchronizing cart:', error);
+      // On error, rollback to previous state
       await loadCart();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedStore, loadCart]);
 
   const addToCart = useCallback(async (product) => {
-    console.log('➕ [App] Добавляем товар в корзину:', product.id);
+    console.log('➕ [App] Adding item to cart:', product.id);
     
-    // Оптимистическое обновление UI с функциональным обновлением
+    // Optimistic UI update with functional update
     let updatedCart;
     setCart(prevCart => {
       const existingItem = prevCart.find(item => item.id === product.id);
@@ -191,34 +191,34 @@ function App() {
       return updatedCart;
     });
     
-    // Синхронизируем с сервером асинхронно
-    // Используем setTimeout чтобы updatedCart был доступен
+    // Synchronize with server asynchronously
+    // Use setTimeout so updatedCart is available
     setTimeout(() => syncCart(updatedCart), 0);
   }, [syncCart]);
 
   const removeFromCart = useCallback(async (productId) => {
-    console.log('➖ [App] Удаляем товар из корзины:', productId);
+    console.log('➖ [App] Removing item from cart:', productId);
     
-    // Оптимистическое обновление UI с функциональным обновлением
+    // Optimistic UI update with functional update
     let updatedCart;
     setCart(prevCart => {
       updatedCart = prevCart.filter(item => item.id !== productId);
       return updatedCart;
     });
     
-    // Синхронизируем с сервером асинхронно
+    // Synchronize with server asynchronously
     setTimeout(() => syncCart(updatedCart), 0);
   }, [syncCart]);
 
   const updateQuantity = useCallback(async (productId, quantity) => {
-    console.log('🔢 [App] Обновляем количество товара:', productId, 'новое количество:', quantity);
+    console.log('🔢 [App] Updating item quantity:', productId, 'new quantity:', quantity);
     
     if (quantity <= 0) {
       await removeFromCart(productId);
       return;
     }
     
-    // Оптимистическое обновление UI с функциональным обновлением
+    // Optimistic UI update with functional update
     let updatedCart;
     setCart(prevCart => {
       updatedCart = prevCart.map(item =>
@@ -227,7 +227,7 @@ function App() {
       return updatedCart;
     });
     
-    // Синхронизируем с сервером асинхронно
+    // Synchronize with server asynchronously
     setTimeout(() => syncCart(updatedCart), 0);
   }, [syncCart, removeFromCart]);
 
@@ -239,7 +239,7 @@ function App() {
     return cart.reduce((total, item) => total + (item.price * item.quantity), 0);
   };
 
-  // Функция для загрузки главной страницы из API
+  // Function to load main page from API
   const loadMains = useCallback(async () => {
     if (mainsData) return;
 
@@ -247,43 +247,43 @@ function App() {
     setMainsError(null);
     
     try {
-      console.log('🏠 [App] Загружаем главную страницу...');
-      console.log('🔍 [App] Параметры запроса:', { locale, apiUrl, retryCount });
+      console.log('🏠 [App] Loading main page...');
+      console.log('🔍 [App] Request parameters:', { locale, apiUrl, retryCount });
       
       const response = await api.getMains(locale);
       
-      // Согласно OpenAPI схеме, ответ содержит объект с полями id и widgets
+      // According to OpenAPI schema, response contains object with id and widgets fields
       if (response && response.widgets && Array.isArray(response.widgets)) {
-        console.log('📊 [App] Получена главная страница:', response.id);
-        console.log('📊 [App] Виджетов на странице:', response.widgets.length);
-        console.log('📊 [App] Полный ответ API:', JSON.stringify(response, null, 2));
+        console.log('📊 [App] Main page received:', response.id);
+        console.log('📊 [App] Widgets on page:', response.widgets.length);
+        console.log('📊 [App] Full API response:', JSON.stringify(response, null, 2));
         
         setMainsData(response);
-        setRetryCount(0); // Сбрасываем счетчик при успешной загрузке
-        console.log('✅ [App] Главная страница установлена успешно');
+        setRetryCount(0); // Reset counter on successful load
+        console.log('✅ [App] Main page set successfully');
       } else {
-        console.warn('⚠️ [App] Неожиданный формат ответа API:', response);
-        console.warn('⚠️ [App] Ожидался объект с полем widgets (массив)');
+        console.warn('⚠️ [App] Unexpected API response format:', response);
+        console.warn('⚠️ [App] Expected object with widgets field (array)');
         setMainsData(null);
       }
     } catch (error) {
-      console.error('❌ [App] Ошибка загрузки главной страницы:');
-      console.error('❌ [App] Тип ошибки:', error.constructor.name);
-      console.error('❌ [App] Сообщение ошибки:', error.message);
-      console.error('❌ [App] Стек ошибки:', error.stack);
-      console.error('❌ [App] Параметры запроса:', { locale, apiUrl, retryCount });
+      console.error('❌ [App] Error loading main page:');
+      console.error('❌ [App] Error type:', error.constructor.name);
+      console.error('❌ [App] Error message:', error.message);
+      console.error('❌ [App] Error stack:', error.stack);
+      console.error('❌ [App] Request parameters:', { locale, apiUrl, retryCount });
       
-      // Детальная обработка различных типов ошибок
+      // Detailed handling of different error types
       if (error.message.includes('404')) {
-        console.log('ℹ️ [App] Главная страница не найдена (404)');
+        console.log('ℹ️ [App] Main page not found (404)');
       } else if (error.message.includes('CORS')) {
-        console.error('🚫 [App] CORS ошибка - проверьте настройки сервера');
+        console.error('🚫 [App] CORS error - check server settings');
       } else if (error.message.includes('Network')) {
-        console.error('🌐 [App] Сетевая ошибка - проверьте подключение к серверу');
+        console.error('🌐 [App] Network error - check server connection');
       } else if (error.message.includes('401') || error.message.includes('403')) {
-        console.error('🔐 [App] Ошибка авторизации - проверьте токен');
+        console.error('🔐 [App] Authorization error - check token');
       } else if (error.message.includes('500')) {
-        console.error('🔥 [App] Внутренняя ошибка сервера');
+        console.error('🔥 [App] Internal server error');
       }
       
       setMainsData(null);
@@ -295,39 +295,39 @@ function App() {
   }, [locale, apiUrl, mainsData, retryCount]);
 
 
-  // Функция для загрузки продуктов из API с пагинацией
+  // Function to load products from API with pagination
   const loadProducts = useCallback(async (categoryId, pageToken = null, limit = 10) => {
     try {
-      console.log('📦 [App] Загружаем продукты для категории:', categoryId, 'page token:', pageToken || 'null (first page)', 'limit:', limit, 'store:', selectedStore?.id);
+      console.log('📦 [App] Loading products for category:', categoryId, 'page token:', pageToken || 'null (first page)', 'limit:', limit, 'store:', selectedStore?.id);
       const response = await api.getProductsList(locale, categoryId, pageToken, limit, selectedStore?.id);
       
-      // Согласно OpenAPI схеме, ответ содержит объект с полем products и next_page_token
+      // According to OpenAPI schema, response contains object with products and next_page_token fields
       if (response && response.products && Array.isArray(response.products)) {
         const productsData = response.products;
-        // next_page_token — строка или null (для последней страницы)
+        // next_page_token — string or null (for last page)
         const nextPageToken = response.next_page_token ?? null;
-        console.log('✅ [App] Продукты загружены:', productsData.length, 'next_page_token:', nextPageToken);
+        console.log('✅ [App] Products loaded:', productsData.length, 'next_page_token:', nextPageToken);
         return { products: productsData, nextPageToken };
       } else {
-        console.warn('⚠️ [App] Неожиданный формат ответа API продуктов:', response);
+        console.warn('⚠️ [App] Unexpected API products response format:', response);
         return { products: [], nextPageToken: null };
       }
     } catch (error) {
-      console.error('❌ [App] Ошибка загрузки продуктов:', error);
+      console.error('❌ [App] Error loading products:', error);
       return { products: [], nextPageToken: null };
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [locale, selectedStore]);
 
-  // Функция для оформления заказа
+  // Function for checkout
   const handleCheckout = async () => {
     if (cart.length === 0 || !cartId) {
-      console.warn('⚠️ [App] Корзина пуста или не создана');
+      console.warn('⚠️ [App] Cart is empty or not created');
       return;
     }
     
-    // TODO: В реальном приложении нужно получить координаты пользователя
-    // Для примера используем фиктивные координаты
+    // TODO: In a real app, need to get user coordinates
+    // For example, using dummy coordinates
     const orderData = {
       position: {
         lat: 55.751244,
@@ -338,10 +338,10 @@ function App() {
     };
 
     try {
-      console.log('📦 [App] Создаём заказ:', orderData);
+      console.log('📦 [App] Creating order:', orderData);
       const result = await api.submitOrder(orderData);
       
-      // После создания заказа очищаем корзину
+      // After creating order, clear the cart
       setCart([]);
       setCartId(null);
       setCartVersion(null);
@@ -349,75 +349,75 @@ function App() {
       // Trigger orders tracking fetch by updating checkoutSuccess timestamp
       setCheckoutSuccess(Date.now());
       
-      console.log('✅ [App] Заказ создан:', result);
+      console.log('✅ [App] Order created:', result);
     } catch (error) {
-      console.error('❌ [App] Ошибка создания заказа:', error);
+      console.error('❌ [App] Error creating order:', error);
     }
   };
 
-  // Загружаем корзину и главную страницу при выборе склада
+  // Load cart and main page when store is selected
   useEffect(() => {
     if (apiUrl && selectedStore) {
-      // Загружаем корзину при выборе склада
-      console.log('🔄 [App] useEffect: Склад выбран, загружаем корзину');
+      // Load cart when store is selected
+      console.log('🔄 [App] useEffect: Store selected, loading cart');
       loadCart();
       
-      // Загружаем главную страницу при выборе склада (только если еще не загружена)
+      // Load main page when store is selected (only if not already loaded)
       if (!mainsData) {
-        console.log('🔄 [App] useEffect: Запускаем загрузку главной страницы');
+        console.log('🔄 [App] useEffect: Starting main page load');
         loadMains();
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [apiUrl, selectedStore, mainsData]);
 
-  // Функция для повторной попытки загрузки
+  // Function for retry loading
   const handleRetry = useCallback(() => {
-    console.log('🔄 [App] Пользователь запросил повторную попытку загрузки');
+    console.log('🔄 [App] User requested retry loading');
     setMainsData(null);
     setMainsError(null);
     setRetryCount(prev => prev + 1);
   }, []);
 
-  // Функция для выбора склада
+  // Function for store selection
   const handleStoreSelect = useCallback((store) => {
-    console.log('🏪 [App] Выбран склад:', store);
+    console.log('🏪 [App] Store selected:', store);
     setSelectedStore(store);
-    // Сбрасываем данные при смене склада
+    // Reset data when store changes
     setMainsData(null);
     setMainsError(null);
     setRetryCount(0);
     setCart([]);
     setCartId(null);
     setCartVersion(null);
-    // Возвращаемся к главной странице
+    // Return to main page
     setCurrentView('main');
     setSelectedCategory(null);
   }, []);
 
-  // Обработчик клика по категории
+  // Category click handler
   const handleCategoryClick = useCallback((category) => {
-    console.log('📂 [App] Клик по категории:', category);
+    console.log('📂 [App] Category clicked:', category);
     setSelectedCategory(category);
     setCurrentView('category');
   }, []);
 
-  // Обработчик возврата к главной странице
+  // Back to main page handler
   const handleBackToMain = useCallback(() => {
-    console.log('🏠 [App] Возврат к главной странице');
+    console.log('🏠 [App] Returning to main page');
     setCurrentView('main');
     setSelectedCategory(null);
   }, []);
 
-  // Функция загрузки продуктов для категории
+  // Function to load products for category
   const loadCategoryProducts = useCallback(async (categoryId, pageToken = null, limit = 10) => {
-    console.log('📦 [App] Загружаем продукты для категории:', categoryId, 'Page token:', pageToken || 'null', 'Store:', selectedStore?.id);
+    console.log('📦 [App] Loading products for category:', categoryId, 'Page token:', pageToken || 'null', 'Store:', selectedStore?.id);
     try {
       const response = await api.getProductsList(locale, categoryId, pageToken, limit, selectedStore?.id);
-      console.log('✅ [App] Продукты загружены:', response);
+      console.log('✅ [App] Products loaded:', response);
       return response;
     } catch (error) {
-      console.error('❌ [App] Ошибка загрузки продуктов:', error);
+      console.error('❌ [App] Error loading products:', error);
       throw error;
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -438,7 +438,7 @@ function App() {
           useRealApi={true}
         />
         
-        {/* Условно рендерим MainView или CategoryView */}
+        {/* Conditionally render MainView or CategoryView */}
         {currentView === 'main' ? (
           <MainView 
             mainsData={mainsData}

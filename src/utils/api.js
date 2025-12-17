@@ -1,30 +1,30 @@
-// Утилиты для работы с API
+// API utilities
 
-// Перехватываем все fetch запросы для отладки
+// Intercept all fetch requests for debugging
 const originalFetch = window.fetch;
 window.fetch = function(...args) {
   const [url, options = {}] = args;
   const method = options.method || 'GET';
   
-  console.log(`🔍 [FETCH INTERCEPTOR] ${method} запрос к:`, url);
-  console.log('🔍 [FETCH INTERCEPTOR] Опции:', options);
+  console.log(`🔍 [FETCH INTERCEPTOR] ${method} request to:`, url);
+  console.log('🔍 [FETCH INTERCEPTOR] Options:', options);
   
   if (method === 'OPTIONS') {
-    console.warn('🚨 [FETCH INTERCEPTOR] Обнаружен OPTIONS запрос!');
+    console.warn('🚨 [FETCH INTERCEPTOR] OPTIONS request detected!');
     console.warn('🚨 [FETCH INTERCEPTOR] URL:', url);
-    console.warn('🚨 [FETCH INTERCEPTOR] Это CORS preflight запрос, отправленный браузером автоматически');
+    console.warn('🚨 [FETCH INTERCEPTOR] This is a CORS preflight request sent automatically by the browser');
   }
   
   return originalFetch.apply(this, args);
 };
 
 /**
- * Выполняет HTTP запрос к API с авторизацией
- * @param {string} endpoint - Endpoint API (например, '/categories' или '/products')
- * @param {string} baseUrl - Базовый URL API
- * @param {string} authToken - Токен авторизации
- * @param {Object} options - Дополнительные опции для fetch
- * @returns {Promise} - Promise с результатом запроса
+ * Performs HTTP request to API with authorization
+ * @param {string} endpoint - API endpoint (e.g., '/categories' or '/products')
+ * @param {string} baseUrl - Base API URL
+ * @param {string} authToken - Authorization token
+ * @param {Object} options - Additional options for fetch
+ * @returns {Promise} - Promise with request result
  */
 export const apiRequest = async (endpoint, baseUrl, authToken, options = {}) => {
   const url = `${baseUrl.replace(/\/$/, '')}${endpoint.startsWith('/') ? endpoint : `/${endpoint}`}`;
@@ -34,7 +34,7 @@ export const apiRequest = async (endpoint, baseUrl, authToken, options = {}) => 
     ...options.headers
   };
 
-  // Добавляем токен авторизации если он указан
+  // Add authorization token if specified
   if (authToken && authToken.trim()) {
     headers['Authorization'] = `Bearer ${authToken.trim()}`;
   }
@@ -45,26 +45,26 @@ export const apiRequest = async (endpoint, baseUrl, authToken, options = {}) => 
   };
 
   const method = options.method || 'POST';
-  console.log(`🌐 [API] ${method} запрос:`, endpoint);
+  console.log(`🌐 [API] ${method} request:`, endpoint);
   console.log('📍 URL:', url);
   console.log('📋 Headers:', headers);
   if (config.body) {
     console.log('📦 Body:', config.body);
   }
   
-  // Специальная проверка для OPTIONS запросов
+  // Special check for OPTIONS requests
   if (method === 'OPTIONS') {
-    console.warn('⚠️ [API] Обнаружен OPTIONS запрос! Это может быть CORS preflight запрос.');
-    console.warn('⚠️ [API] Убедитесь, что сервер правильно обрабатывает CORS preflight запросы.');
+    console.warn('⚠️ [API] OPTIONS request detected! This may be a CORS preflight request.');
+    console.warn('⚠️ [API] Make sure the server properly handles CORS preflight requests.');
   }
   
   try {
-    // Добавляем timeout для предотвращения зависания запросов
+    // Add timeout to prevent hanging requests
     const controller = new AbortController();
     const timeoutId = setTimeout(() => {
-      console.warn('⏰ [API] Таймаут запроса:', url);
+      console.warn('⏰ [API] Request timeout:', url);
       controller.abort();
-    }, 30000); // 30 секунд timeout
+    }, 30000); // 30 seconds timeout
 
     const response = await fetch(url, {
       ...config,
@@ -73,18 +73,18 @@ export const apiRequest = async (endpoint, baseUrl, authToken, options = {}) => 
     
     clearTimeout(timeoutId);
     
-    console.log('📡 [API] Ответ сервера:');
+    console.log('📡 [API] Server response:');
     console.log('🔢 Status:', response.status, response.statusText);
     console.log('📋 Response Headers:', Object.fromEntries(response.headers.entries()));
     
-    // Дополнительная проверка для CORS
+    // Additional check for CORS
     if (response.status === 0 || (response.status === 200 || response.status === 204) && method === 'OPTIONS') {
-      console.log('ℹ️ [API] Получен ответ на OPTIONS запрос (CORS preflight)');
+      console.log('ℹ️ [API] Received response for OPTIONS request (CORS preflight)');
     }
     
     if (!response.ok) {
       const errorText = await response.text();
-      console.error('❌ [API] Ошибка HTTP:');
+      console.error('❌ [API] HTTP Error:');
       console.error('❌ [API] Status:', response.status);
       console.error('❌ [API] Status Text:', response.statusText);
       console.error('❌ [API] Response Body:', errorText);
@@ -92,7 +92,7 @@ export const apiRequest = async (endpoint, baseUrl, authToken, options = {}) => 
       console.error('❌ [API] Request Method:', options.method || 'POST');
       console.error('❌ [API] Request Headers:', headers);
       
-      // Создаем детальную ошибку
+      // Create detailed error
       const detailedError = new Error(`HTTP ${response.status}: ${response.statusText} - ${errorText}`);
       detailedError.status = response.status;
       detailedError.statusText = response.statusText;
@@ -102,17 +102,17 @@ export const apiRequest = async (endpoint, baseUrl, authToken, options = {}) => 
       throw detailedError;
     }
     
-    // Обработка пустых ответов (204 No Content)
+    // Handle empty responses (204 No Content)
     if (response.status === 204) {
-      console.log('✅ [API] Успешный ответ (204 No Content)');
-      return {}; // Возвращаем пустой объект для 204 ответов
+      console.log('✅ [API] Successful response (204 No Content)');
+      return {}; // Return empty object for 204 responses
     }
     
     const responseData = await response.json();
-    console.log('✅ [API] Успешный ответ:', responseData);
+    console.log('✅ [API] Successful response:', responseData);
     return responseData;
   } catch (error) {
-    console.error('💥 [API] Ошибка запроса:');
+    console.error('💥 [API] Request error:');
     console.error('💥 [API] URL:', url);
     console.error('💥 [API] Method:', options.method || 'POST');
     console.error('💥 [API] Headers:', headers);
@@ -120,31 +120,31 @@ export const apiRequest = async (endpoint, baseUrl, authToken, options = {}) => 
     console.error('💥 [API] Error Message:', error.message);
     console.error('💥 [API] Error Stack:', error.stack);
     
-    // Обработка timeout ошибок
+    // Handle timeout errors
     if (error.name === 'AbortError') {
-      const timeoutError = new Error('Request Timeout: Запрос превысил время ожидания (30 секунд). Сервер может быть недоступен или медленно отвечает.');
+      const timeoutError = new Error('Request Timeout: Request exceeded wait time (30 seconds). Server may be unavailable or slow to respond.');
       timeoutError.isTimeoutError = true;
       timeoutError.originalError = error;
       throw timeoutError;
     }
     
-    // Обработка CORS ошибок
+    // Handle CORS errors
     if (error.message.includes('CORS') || error.message.includes('Access-Control-Allow-Origin')) {
-      const corsError = new Error('CORS Error: Сервер не разрешает запросы с этого домена. Возможно, нужно настроить CORS на сервере или использовать прокси.');
+      const corsError = new Error('CORS Error: Server does not allow requests from this domain. You may need to configure CORS on the server or use a proxy.');
       corsError.isCorsError = true;
       corsError.originalError = error;
       throw corsError;
     }
     
     if (error.message.includes('NetworkError') || error.message.includes('Failed to fetch')) {
-      const networkError = new Error('Network Error: Не удается подключиться к серверу. Проверьте URL и доступность сервера.');
+      const networkError = new Error('Network Error: Unable to connect to server. Check the URL and server availability.');
       networkError.isNetworkError = true;
       networkError.originalError = error;
       throw networkError;
     }
     
     if (error.message.includes('TypeError')) {
-      const typeError = new Error(`Type Error: ${error.message}. Возможно, проблема с форматом данных.`);
+      const typeError = new Error(`Type Error: ${error.message}. There may be an issue with the data format.`);
       typeError.isTypeError = true;
       typeError.originalError = error;
       throw typeError;
@@ -157,19 +157,19 @@ export const apiRequest = async (endpoint, baseUrl, authToken, options = {}) => 
 
 
 /**
- * Создает новый заказ из корзины
- * @param {string} baseUrl - Базовый URL API
- * @param {string} authToken - Токен авторизации
- * @param {Object} orderData - Данные заказа
- * @param {Object} orderData.position - Координаты доставки {lat: number, lon: number}
- * @param {string} orderData.cart_id - ID корзины
- * @param {number} orderData.cart_version - Версия корзины
- * @returns {Promise<Object>} - Promise с результатом создания заказа {order_id: string}
+ * Creates a new order from cart
+ * @param {string} baseUrl - Base API URL
+ * @param {string} authToken - Authorization token
+ * @param {Object} orderData - Order data
+ * @param {Object} orderData.position - Delivery coordinates {lat: number, lon: number}
+ * @param {string} orderData.cart_id - Cart ID
+ * @param {number} orderData.cart_version - Cart version
+ * @returns {Promise<Object>} - Promise with order creation result {order_id: string}
  */
 export const createOrder = async (baseUrl, authToken, orderData) => {
-  console.log('📦 [createOrder] Создаём заказ:', orderData);
+  console.log('📦 [createOrder] Creating order:', orderData);
   
-  // Генерируем idempotency token для безопасности запроса
+  // Generate idempotency token for request safety
   const idempotencyToken = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
   
   return apiRequest('/b2b/v1/front/orders/create', baseUrl, authToken, {
@@ -182,11 +182,11 @@ export const createOrder = async (baseUrl, authToken, orderData) => {
 };
 
 /**
- * Получает статус заказа
- * @param {string} baseUrl - Базовый URL API
- * @param {string} authToken - Токен авторизации
- * @param {string} orderId - ID заказа
- * @returns {Promise<Object>} - Promise с данными заказа
+ * Gets order status
+ * @param {string} baseUrl - Base API URL
+ * @param {string} authToken - Authorization token
+ * @param {string} orderId - Order ID
+ * @returns {Promise<Object>} - Promise with order data
  */
 export const fetchOrderStatus = async (baseUrl, authToken, orderId) => {
   return apiRequest('/orders/status', baseUrl, authToken, {
@@ -196,12 +196,12 @@ export const fetchOrderStatus = async (baseUrl, authToken, orderId) => {
 };
 
 /**
- * Обновляет статус заказа
- * @param {string} baseUrl - Базовый URL API
- * @param {string} authToken - Токен авторизации
- * @param {string} orderId - ID заказа
- * @param {string} status - Новый статус
- * @returns {Promise<Object>} - Promise с результатом обновления
+ * Updates order status
+ * @param {string} baseUrl - Base API URL
+ * @param {string} authToken - Authorization token
+ * @param {string} orderId - Order ID
+ * @param {string} status - New status
+ * @returns {Promise<Object>} - Promise with update result
  */
 export const updateOrderStatus = async (baseUrl, authToken, orderId, status) => {
   return apiRequest('/orders/update-status', baseUrl, authToken, {
@@ -211,15 +211,15 @@ export const updateOrderStatus = async (baseUrl, authToken, orderId, status) => 
 };
 
 /**
- * Получает список складов
- * @param {string} baseUrl - Базовый URL API
- * @param {string} authToken - Токен авторизации
- * @returns {Promise<Object>} - Promise с объектом содержащим массив stores
+ * Gets list of stores
+ * @param {string} baseUrl - Base API URL
+ * @param {string} authToken - Authorization token
+ * @returns {Promise<Object>} - Promise with object containing stores array
  */
 export const fetchStores = async (baseUrl, authToken) => {
-  console.log('🏪 [fetchStores] Начинаем запрос списка складов');
-  console.log('🏪 [fetchStores] Параметры:', { baseUrl, authToken: authToken ? '***' : 'не указан' });
-  console.log('⏰ [fetchStores] Установлен timeout: 30 секунд');
+  console.log('🏪 [fetchStores] Starting stores list request');
+  console.log('🏪 [fetchStores] Parameters:', { baseUrl, authToken: authToken ? '***' : 'not specified' });
+  console.log('⏰ [fetchStores] Timeout set: 30 seconds');
   
   try {
     const result = await apiRequest('/b2b/v1/front/stores/get', baseUrl, authToken, {
@@ -227,15 +227,15 @@ export const fetchStores = async (baseUrl, authToken) => {
       body: JSON.stringify({})
     });
     
-    console.log('✅ [fetchStores] Запрос успешно завершен');
+    console.log('✅ [fetchStores] Request completed successfully');
     return result;
   } catch (error) {
-    console.error('❌ [fetchStores] Ошибка запроса складов:', error);
+    console.error('❌ [fetchStores] Error fetching stores:', error);
     
-    // Специальная обработка для timeout ошибок
+    // Special handling for timeout errors
     if (error.isTimeoutError) {
-      console.error('⏰ [fetchStores] Запрос превысил время ожидания');
-      throw new Error('Запрос списка складов превысил время ожидания. Сервер может быть недоступен или медленно отвечает.');
+      console.error('⏰ [fetchStores] Request exceeded wait time');
+      throw new Error('Stores list request timed out. Server may be unavailable or slow to respond.');
     }
     
     throw error;
@@ -244,31 +244,31 @@ export const fetchStores = async (baseUrl, authToken) => {
 
 
 /**
- * Получает главную страницу с виджетами через OpenAPI схему
- * @param {string} baseUrl - Базовый URL API
- * @param {string} authToken - Токен авторизации
- * @param {string} locale - Локаль для запроса (например, 'en', 'ru')
- * @returns {Promise<Object>} - Promise с объектом содержащим id и widgets
+ * Gets main page with widgets via OpenAPI schema
+ * @param {string} baseUrl - Base API URL
+ * @param {string} authToken - Authorization token
+ * @param {string} locale - Locale for request (e.g., 'en', 'ru')
+ * @returns {Promise<Object>} - Promise with object containing id and widgets
  */
 export const fetchMains = async (baseUrl, authToken, locale = 'en') => {
   return apiRequest('/b2b/v1/front/mains/get', baseUrl, authToken, {
     method: 'POST',
-    body: JSON.stringify({ locale }) // Локаль согласно OpenAPI спецификации
+    body: JSON.stringify({ locale }) // Locale according to OpenAPI specification
   });
 };
 
 /**
- * Получает список продуктов с пагинацией через OpenAPI схему
- * @param {string} baseUrl - Базовый URL API
- * @param {string} authToken - Токен авторизации
- * @param {string} locale - Локаль для запроса (например, 'en', 'ru')
- * @param {string} categoryId - ID категории для фильтрации продуктов (обязательный параметр)
- * @param {string|null} pageToken - Токен страницы (null для первой страницы, может быть опущен)
- * @param {number} limit - Количество продуктов на странице (максимум 100)
- * @returns {Promise<Object>} - Promise с объектом содержащим массив products и next_page_token
+ * Gets products list with pagination via OpenAPI schema
+ * @param {string} baseUrl - Base API URL
+ * @param {string} authToken - Authorization token
+ * @param {string} locale - Locale for request (e.g., 'en', 'ru')
+ * @param {string} categoryId - Category ID for filtering products (required parameter)
+ * @param {string|null} pageToken - Page token (null for first page, can be omitted)
+ * @param {number} limit - Number of products per page (maximum 100)
+ * @returns {Promise<Object>} - Promise with object containing products array and next_page_token
  */
 export const fetchProductsList = async (baseUrl, authToken, locale = 'en', categoryId, pageToken = null, limit = 10, storeId = null) => {
-  console.log('📦 [fetchProductsList] Загружаем продукты для категории:', categoryId);
+  console.log('📦 [fetchProductsList] Loading products for category:', categoryId);
   console.log('📦 [fetchProductsList] Page token:', pageToken || 'null (first page)', 'Limit:', limit, 'Store ID:', storeId);
   
   const requestBody = { 
@@ -277,13 +277,13 @@ export const fetchProductsList = async (baseUrl, authToken, locale = 'en', categ
     limit: limit
   };
   
-  // Добавляем store_id если он указан
+  // Add store_id if specified
   if (storeId) {
     requestBody.store_id = storeId;
   }
   
-  // page_token: null — запрос первой страницы (поле не включается в запрос)
-  // page_token: string — запрос следующей страницы (значение из next_page_token предыдущего ответа)
+  // page_token: null — first page request (field not included in request)
+  // page_token: string — next page request (value from next_page_token of previous response)
   if (pageToken !== null) {
     console.log('🔄 [fetchProductsList] page_token:', pageToken);
     requestBody.page_token = pageToken;
@@ -300,14 +300,14 @@ export const fetchProductsList = async (baseUrl, authToken, locale = 'en', categ
 };
 
 /**
- * Получает корзину пользователя
- * @param {string} baseUrl - Базовый URL API
- * @param {string} authToken - Токен авторизации
- * @param {string|null} cartId - ID корзины (опционально, если не указан - вернётся текущая корзина пользователя)
- * @returns {Promise<Object>} - Promise с данными корзины
+ * Gets user's cart
+ * @param {string} baseUrl - Base API URL
+ * @param {string} authToken - Authorization token
+ * @param {string|null} cartId - Cart ID (optional, if not specified - returns current user's cart)
+ * @returns {Promise<Object>} - Promise with cart data
  */
 export const fetchCart = async (baseUrl, authToken, cartId = null) => {
-  console.log('🛒 [fetchCart] Загружаем корзину, ID:', cartId || 'current user cart');
+  console.log('🛒 [fetchCart] Loading cart, ID:', cartId || 'current user cart');
   
   const requestBody = {};
   if (cartId) {
@@ -321,14 +321,14 @@ export const fetchCart = async (baseUrl, authToken, cartId = null) => {
 };
 
 /**
- * Получает информацию о заказах для отслеживания
- * @param {string} baseUrl - Базовый URL API
- * @param {string} authToken - Токен авторизации
- * @param {string|null} orderId - ID конкретного заказа (опционально)
- * @returns {Promise<Array>} - Promise с массивом OrdersTrackingOrderInfo
+ * Gets orders tracking information
+ * @param {string} baseUrl - Base API URL
+ * @param {string} authToken - Authorization token
+ * @param {string|null} orderId - Specific order ID (optional)
+ * @returns {Promise<Array>} - Promise with OrdersTrackingOrderInfo array
  */
 export const fetchOrdersTracking = async (baseUrl, authToken, orderId = null) => {
-  console.log('📋 [fetchOrdersTracking] Загружаем информацию о заказах, orderId:', orderId || 'all active');
+  console.log('📋 [fetchOrdersTracking] Loading orders info, orderId:', orderId || 'all active');
   
   const requestBody = {};
   if (orderId) {
@@ -342,22 +342,22 @@ export const fetchOrdersTracking = async (baseUrl, authToken, orderId = null) =>
 };
 
 /**
- * Создаёт или обновляет корзину
- * @param {string} baseUrl - Базовый URL API
- * @param {string} authToken - Токен авторизации
- * @param {Object} cartData - Данные корзины
- * @param {Array} cartData.items - Массив товаров в корзине [{id: string, quantity: number}]
- * @param {string} cartData.fulfillment_method - Способ получения ('pickup' или 'courier')
- * @param {string|null} cartData.store_id - ID склада (обязателен для pickup)
- * @param {Object|null} cartData.position - Координаты доставки (обязательны для courier)
- * @param {string|null} cartData.id - ID корзины (для обновления существующей)
- * @param {number|null} cartData.version - Версия корзины (для обновления существующей)
- * @returns {Promise<Object>} - Promise с обновлённой корзиной
+ * Creates or updates cart
+ * @param {string} baseUrl - Base API URL
+ * @param {string} authToken - Authorization token
+ * @param {Object} cartData - Cart data
+ * @param {Array} cartData.items - Array of cart items [{id: string, quantity: number}]
+ * @param {string} cartData.fulfillment_method - Fulfillment method ('pickup' or 'courier')
+ * @param {string|null} cartData.store_id - Store ID (required for pickup)
+ * @param {Object|null} cartData.position - Delivery coordinates (required for courier)
+ * @param {string|null} cartData.id - Cart ID (for updating existing cart)
+ * @param {number|null} cartData.version - Cart version (for updating existing cart)
+ * @returns {Promise<Object>} - Promise with updated cart
  */
 export const setCart = async (baseUrl, authToken, cartData) => {
-  console.log('🛒 [setCart] Обновляем корзину:', cartData);
+  console.log('🛒 [setCart] Updating cart:', cartData);
   
-  // Генерируем idempotency token для безопасности запроса
+  // Generate idempotency token for request safety
   const idempotencyToken = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
   
   const requestBody = {
@@ -365,17 +365,17 @@ export const setCart = async (baseUrl, authToken, cartData) => {
     fulfillment_method: cartData.fulfillment_method || 'pickup'
   };
 
-  // Добавляем store_id для pickup
+  // Add store_id for pickup
   if (cartData.store_id) {
     requestBody.store_id = cartData.store_id;
   }
 
-  // Добавляем position для courier
+  // Add position for courier
   if (cartData.position) {
     requestBody.position = cartData.position;
   }
 
-  // Добавляем id и version для обновления существующей корзины
+  // Add id and version for updating existing cart
   if (cartData.id) {
     requestBody.id = cartData.id;
   }

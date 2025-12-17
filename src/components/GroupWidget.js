@@ -3,22 +3,22 @@ import CategoryCard from './CategoryCard';
 import './GroupWidget.css';
 
 /**
- * Компонент для отображения группы категорий
- * @param {Object} props - Свойства компонента
- * @param {Object} props.widget - Данные виджета группы
- * @param {string} props.widget.id - ID группы
- * @param {string} props.widget.title - Заголовок группы
- * @param {Array} props.widget.categories - Массив категорий
- * @param {Function} props.onCategoryClick - Обработчик клика по категории
- * @returns {JSX.Element} - JSX элемент группы категорий
+ * Component for displaying category group
+ * @param {Object} props - Component properties
+ * @param {Object} props.widget - Group widget data
+ * @param {string} props.widget.id - Group ID
+ * @param {string} props.widget.title - Group title
+ * @param {Array} props.widget.categories - Array of categories
+ * @param {Function} props.onCategoryClick - Category click handler
+ * @returns {JSX.Element} - JSX element of category group
  */
 const GroupWidget = ({ widget, onCategoryClick }) => {
   if (!widget || !widget.categories || !Array.isArray(widget.categories)) {
-    console.warn('⚠️ [GroupWidget] Некорректные данные виджета:', widget);
+    console.warn('⚠️ [GroupWidget] Invalid widget data:', widget);
     return null;
   }
 
-  console.log('📂 [GroupWidget] Рендерим группу:', widget.title, 'с', widget.categories.length, 'категориями');
+  console.log('📂 [GroupWidget] Rendering group:', widget.title, 'with', widget.categories.length, 'categories');
 
   return (
     <div className="group-widget">

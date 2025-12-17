@@ -3,14 +3,14 @@ import { useApi } from '../hooks/useApi';
 import './StoreSelector.css';
 
 function StoreSelector({ selectedStore, onStoreSelect, apiUrl, authToken }) {
-  console.log('🏪 [StoreSelector] Компонент рендерится с пропсами:', {
-    selectedStore: selectedStore ? selectedStore.name : 'не выбран',
+  console.log('🏪 [StoreSelector] Component rendering with props:', {
+    selectedStore: selectedStore ? selectedStore.name : 'not selected',
     apiUrl,
-    authToken: authToken ? '***' : 'не указан'
+    authToken: authToken ? '***' : 'not specified'
   });
   
-  // Дополнительное логирование для отладки
-  console.warn('🔍 [DEBUG] StoreSelector рендерится!');
+  // Additional logging for debugging
+  console.warn('🔍 [DEBUG] StoreSelector rendering!');
 
     const [showStoreList, setShowStoreList] = useState(false);
     const [stores, setStores] = useState([]);
@@ -38,50 +38,50 @@ function StoreSelector({ selectedStore, onStoreSelect, apiUrl, authToken }) {
     return 'Working hours not specified';
   };
 
-  // Загружаем список складов
+  // Load stores list
   const loadStores = useCallback(async () => {
-    // Проверяем, не идет ли уже загрузка
+    // Check if loading is already in progress
     if (api.loading || isRequestInProgress) {
-      console.log('⏳ [StoreSelector] Загрузка уже идет, пропускаем...');
+      console.log('⏳ [StoreSelector] Loading already in progress, skipping...');
       return;
     }
     
-    // Проверяем, не было ли ошибки (если была, загружаем только по кнопке повтора)
+    // Check if there was an error (if so, load only via retry button)
     if (error && stores.length === 0) {
-      console.log('⚠️ [StoreSelector] Есть ошибка, загрузка только по кнопке повтора');
+      console.log('⚠️ [StoreSelector] There is an error, loading only via retry button');
       return;
     }
     
-    // Устанавливаем флаг загрузки
+    // Set loading flag
     setIsRequestInProgress(true);
     
-    console.log('🏪 [StoreSelector] Начинаем загрузку складов...');
-    console.log('🔧 [StoreSelector] Настройки:', { apiUrl, authToken: authToken ? '***' : 'не указан' });
+    console.log('🏪 [StoreSelector] Starting stores loading...');
+    console.log('🔧 [StoreSelector] Settings:', { apiUrl, authToken: authToken ? '***' : 'not specified' });
     
 
-    console.log('🌐 [StoreSelector] Загружаем данные из реального API...');
+    console.log('🌐 [StoreSelector] Loading data from real API...');
     setError(null);
 
     try {
-      // Используем API хук для получения списка складов
+      // Use API hook to get stores list
       const data = await api.getStores();
       
-      // Согласно OpenAPI спецификации, ответ должен содержать поле stores
+      // According to OpenAPI specification, response should contain stores field
       if (data && data.stores && Array.isArray(data.stores)) {
-        console.log('📊 [StoreSelector] Получены данные складов:', data.stores.length, 'складов');
-        console.log('📊 [StoreSelector] Пример данных склада:', data.stores[0]);
+        console.log('📊 [StoreSelector] Store data received:', data.stores.length, 'stores');
+        console.log('📊 [StoreSelector] Sample store data:', data.stores[0]);
         
-        // Преобразуем данные API в формат, понятный нашему компоненту
+        // Transform API data to format understood by our component
         const formattedStores = data.stores.map(store => {
-          // Проверяем обязательные поля согласно схеме
+          // Check required fields according to schema
           if (!store.id || !store.status || !store.location) {
-            console.warn('⚠️ [StoreSelector] Склад с неполными данными:', store);
+            console.warn('⚠️ [StoreSelector] Store with incomplete data:', store);
           }
           
           return {
             id: store.id,
-            name: store.name || `Склад ${store.id}`,
-            address: store.address || 'Адрес не указан',
+            name: store.name || `Store ${store.id}`,
+            address: store.address || 'Address not specified',
             coordinates: store.location ? {
               lat: store.location.lat,
               lon: store.location.lon
@@ -90,28 +90,28 @@ function StoreSelector({ selectedStore, onStoreSelect, apiUrl, authToken }) {
               formatStoreSchedule(store.store_schedule) : 'Working hours not specified',
             status: store.status || 'unknown',
             timezone: store.timezone || null,
-            // Дополнительные поля из схемы
+            // Additional fields from schema
             store_schedule: store.store_schedule || null
           };
         });
         
         setStores(formattedStores);
-        console.log('✅ [StoreSelector] Данные API успешно загружены:', formattedStores.length, 'складов');
-        console.log('📊 [StoreSelector] Установлены склады:', formattedStores);
+        console.log('✅ [StoreSelector] API data loaded successfully:', formattedStores.length, 'stores');
+        console.log('📊 [StoreSelector] Stores set:', formattedStores);
       } else {
-        console.warn('⚠️ [StoreSelector] Неожиданный формат ответа API:', data);
-        console.warn('⚠️ [StoreSelector] Ожидался объект с полем stores (массив)');
+        console.warn('⚠️ [StoreSelector] Unexpected API response format:', data);
+        console.warn('⚠️ [StoreSelector] Expected object with stores field (array)');
         setStores([]);
       }
     } catch (err) {
-      console.error('❌ [StoreSelector] Ошибка загрузки складов:', err);
-      console.error('❌ [StoreSelector] Тип ошибки:', err.constructor.name);
-      console.error('❌ [StoreSelector] Сообщение ошибки:', err.message);
+      console.error('❌ [StoreSelector] Error loading stores:', err);
+      console.error('❌ [StoreSelector] Error type:', err.constructor.name);
+      console.error('❌ [StoreSelector] Error message:', err.message);
       
       // Detailed error handling
       let errorMessage = 'Error loading stores';
       
-      if (err.isTimeoutError || err.message.includes('превысил время ожидания')) {
+      if (err.isTimeoutError || err.message.includes('exceeded wait time')) {
         errorMessage = 'Request timed out (30 seconds). Server may be unavailable or slow to respond. Please try again.';
       } else if (err.isCorsError || err.message.includes('CORS')) {
         errorMessage = 'CORS error: Server does not allow requests from local domain. Try using a proxy or configure CORS on the server.';
@@ -129,28 +129,28 @@ function StoreSelector({ selectedStore, onStoreSelect, apiUrl, authToken }) {
       
       setError(errorMessage);
       
-      // В случае ошибки оставляем список складов пустым
-      console.log('🔄 [StoreSelector] Список складов остается пустым из-за ошибки');
+      // On error, leave stores list empty
+      console.log('🔄 [StoreSelector] Stores list remains empty due to error');
       setStores([]);
     } finally {
-      console.log('🏁 [StoreSelector] Загрузка завершена');
+      console.log('🏁 [StoreSelector] Loading completed');
       setIsRequestInProgress(false);
     }
   }, [apiUrl, authToken, api.loading, error, stores.length, isRequestInProgress]);
 
-  // Очищаем список складов и выбранный склад при изменении настроек API
+  // Clear stores list and selected store when API settings change
   useEffect(() => {
-    console.log('🔄 [StoreSelector] Настройки API изменились, очищаем данные');
+    console.log('🔄 [StoreSelector] API settings changed, clearing data');
     setStores([]);
     setError(null);
-    // Очищаем выбранный склад при изменении режима API
+    // Clear selected store when API mode changes
     if (selectedStore) {
-      console.log('🗑️ [StoreSelector] Сбрасываем выбранный склад:', selectedStore.name);
+      console.log('🗑️ [StoreSelector] Resetting selected store:', selectedStore.name);
       onStoreSelect(null);
     }
-  }, [apiUrl, authToken]); // Убрали selectedStore и onStoreSelect из зависимостей
+  }, [apiUrl, authToken]); // Removed selectedStore and onStoreSelect from dependencies
 
-  // Загружаем склады только при первом открытии списка (если нет ошибки)
+  // Load stores only on first list open (if no error)
   useEffect(() => {
     console.log('🔍 [StoreSelector] useEffect triggered:', { 
       showStoreList, 
@@ -160,7 +160,7 @@ function StoreSelector({ selectedStore, onStoreSelect, apiUrl, authToken }) {
       isRequestInProgress 
     });
     if (showStoreList && stores.length === 0 && !api.loading && !error && !isRequestInProgress) {
-      console.log('📂 [StoreSelector] Открыто модальное окно, загружаем склады');
+      console.log('📂 [StoreSelector] Modal opened, loading stores');
       loadStores();
     }
   }, [showStoreList, stores.length, loadStores, api.loading, error, isRequestInProgress]);
@@ -170,12 +170,12 @@ function StoreSelector({ selectedStore, onStoreSelect, apiUrl, authToken }) {
     setShowStoreList(false);
   };
 
-  // Логируем состояние компонента при каждом рендере
-  console.log('🎨 [StoreSelector] Рендер компонента:', {
+  // Log component state on each render
+  console.log('🎨 [StoreSelector] Component render:', {
     loading: api.loading,
     storesCount: stores.length,
     showStoreList,
-    selectedStore: selectedStore ? selectedStore.name : 'не выбран',
+    selectedStore: selectedStore ? selectedStore.name : 'not selected',
     error
   });
 
@@ -193,7 +193,7 @@ function StoreSelector({ selectedStore, onStoreSelect, apiUrl, authToken }) {
         <button 
           className="select-store-btn"
           onClick={() => {
-            console.log('🖱️ [StoreSelector] "Select store" button clicked');
+            console.log('🖱️ [StoreSelector] "Select Store" button clicked');
             setShowStoreList(true);
           }}
         >
@@ -232,7 +232,7 @@ function StoreSelector({ selectedStore, onStoreSelect, apiUrl, authToken }) {
                   <button 
                     className="retry-button"
                     onClick={() => {
-                      console.log('🔄 [StoreSelector] Retrying store loading');
+                      console.log('🔄 [StoreSelector] Retrying stores loading');
                       setError(null);
                       setIsRequestInProgress(false);
                       loadStores();

@@ -3,16 +3,16 @@ import ProductCard from './ProductCard';
 import './CategoryView.css';
 
 /**
- * Компонент для отображения категории и её продуктов с ленивой загрузкой
- * @param {Object} props - Свойства компонента
- * @param {Object} props.category - Данные категории
- * @param {Function} props.onAddToCart - Обработчик добавления в корзину
- * @param {Function} props.onBack - Обработчик возврата к главной странице
- * @param {Function} props.onLoadProducts - Функция загрузки продуктов для категории
- * @param {boolean} props.loading - Состояние загрузки
- * @param {string} props.error - Сообщение об ошибке
- * @param {string} props.locale - Локаль для API запросов
- * @returns {JSX.Element} - JSX элемент страницы категории
+ * Component for displaying category and its products with lazy loading
+ * @param {Object} props - Component properties
+ * @param {Object} props.category - Category data
+ * @param {Function} props.onAddToCart - Add to cart handler
+ * @param {Function} props.onBack - Back to main page handler
+ * @param {Function} props.onLoadProducts - Function to load products for category
+ * @param {boolean} props.loading - Loading state
+ * @param {string} props.error - Error message
+ * @param {string} props.locale - Locale for API requests
+ * @returns {JSX.Element} - JSX element of category page
  */
 const CategoryView = ({ 
   category, 
@@ -32,16 +32,16 @@ const CategoryView = ({
   const observerRef = useRef();
   const loadingRef = useRef();
 
-  // Загружаем продукты при монтировании компонента
+  // Load products when component mounts
   useEffect(() => {
     if (category && !initialLoad) {
-      console.log('📦 [CategoryView] Загружаем продукты для категории:', category.id);
+      console.log('📦 [CategoryView] Loading products for category:', category.id);
       loadProducts();
       setInitialLoad(true);
     }
   }, [category, initialLoad]);
 
-  // Функция загрузки продуктов
+  // Products loading function
   const loadProducts = useCallback(async (nextPageToken = null) => {
     if (!category || loadingMore) return;
     
@@ -50,32 +50,32 @@ const CategoryView = ({
       const response = await onLoadProducts(category.id, nextPageToken);
       if (response && response.products) {
         if (nextPageToken) {
-          // Добавляем к существующим продуктам
+          // Add to existing products
           setProducts(prev => [...prev, ...response.products]);
         } else {
-          // Заменяем продукты (первая загрузка)
+          // Replace products (first load)
           setProducts(response.products);
         }
-        // next_page_token — строка или null (для последней страницы)
+        // next_page_token — string or null (for last page)
         const nextPageTokenValue = response.next_page_token ?? null;
         setPageToken(nextPageTokenValue);
         setHasMore(!!response.next_page_token);
       }
     } catch (err) {
-      console.error('❌ [CategoryView] Ошибка загрузки продуктов:', err);
+      console.error('❌ [CategoryView] Error loading products:', err);
     } finally {
       setLoadingMore(false);
     }
   }, [category, onLoadProducts, loadingMore]);
 
-  // Intersection Observer для ленивой загрузки
+  // Intersection Observer for lazy loading
   useEffect(() => {
     if (!hasMore || loadingMore) return;
 
     const observer = new IntersectionObserver(
       (entries) => {
         if (entries[0].isIntersecting && hasMore && !loadingMore) {
-          console.log('🔄 [CategoryView] Загружаем следующую страницу продуктов');
+          console.log('🔄 [CategoryView] Loading next page of products');
           loadProducts(pageToken);
         }
       },

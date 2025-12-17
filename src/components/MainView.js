@@ -5,17 +5,17 @@ import RadialCarousel from './RadialCarousel';
 import './MainView.css';
 
 /**
- * Компонент для отображения главной страницы с виджетами
- * @param {Object} props - Свойства компонента
- * @param {Object} props.mainsData - Данные главной страницы с виджетами
- * @param {Function} props.onAddToCart - Обработчик добавления в корзину
- * @param {Function} props.onCategoryClick - Обработчик клика по категории
- * @param {Function} props.onLoadProducts - Обработчик загрузки продуктов для категории
- * @param {boolean} props.loading - Состояние загрузки
- * @param {string} props.error - Сообщение об ошибке
- * @param {Object} props.selectedStore - Выбранный склад
- * @param {boolean} props.useRealApi - Использовать реальный API
- * @returns {JSX.Element} - JSX элемент главной страницы
+ * Component for displaying main page with widgets
+ * @param {Object} props - Component properties
+ * @param {Object} props.mainsData - Main page data with widgets
+ * @param {Function} props.onAddToCart - Add to cart handler
+ * @param {Function} props.onCategoryClick - Category click handler
+ * @param {Function} props.onLoadProducts - Products loading handler for category
+ * @param {boolean} props.loading - Loading state
+ * @param {string} props.error - Error message
+ * @param {Object} props.selectedStore - Selected store
+ * @param {boolean} props.useRealApi - Use real API
+ * @returns {JSX.Element} - JSX element of main page
  */
 const MainView = ({ 
   mainsData, 
@@ -45,18 +45,18 @@ const MainView = ({
     return () => window.removeEventListener('resize', updateSize);
   }, []);
 
-  // Функция для загрузки продуктов для карусели
+  // Function to load products for carousel
   const loadCarouselProducts = useCallback(async (categoryId) => {
     if (!useRealApi || !onLoadProducts || carouselProducts[categoryId]) {
       return;
     }
 
     try {
-      console.log('🎠 [MainView] Загружаем продукты для карусели категории:', categoryId);
+      console.log('🎠 [MainView] Loading products for carousel category:', categoryId);
       setCarouselLoading(prev => ({ ...prev, [categoryId]: true }));
       
-      // Загружаем только первую страницу с лимитом 5 (максимум для карусели)
-      // Используем null для первой страницы (page_token не включается в запрос)
+      // Load only first page with limit 5 (maximum for carousel)
+      // Use null for first page (page_token not included in request)
       const result = await onLoadProducts(categoryId, null, 5);
       
       setCarouselProducts(prev => ({ 
@@ -64,9 +64,9 @@ const MainView = ({
         [categoryId]: result?.products || [] 
       }));
       
-      console.log('✅ [MainView] Продукты для карусели загружены:', result?.products?.length || 0);
+      console.log('✅ [MainView] Carousel products loaded:', result?.products?.length || 0);
     } catch (error) {
-      console.error('❌ [MainView] Ошибка загрузки продуктов для карусели:', error);
+      console.error('❌ [MainView] Error loading carousel products:', error);
       setCarouselProducts(prev => ({ 
         ...prev, 
         [categoryId]: [] 
@@ -76,7 +76,7 @@ const MainView = ({
     }
   }, [useRealApi, onLoadProducts, carouselProducts]);
 
-  // Загружаем продукты для всех каруселей при получении данных
+  // Load products for all carousels when data is received
   useEffect(() => {
     if (mainsData && mainsData.widgets && Array.isArray(mainsData.widgets)) {
       mainsData.widgets.forEach(widget => {
@@ -87,9 +87,9 @@ const MainView = ({
     }
   }, [mainsData, loadCarouselProducts]);
 
-  // Обработчик клика по категории
+  // Category click handler
   const handleCategoryClick = useCallback((category) => {
-    console.log('📂 [MainView] Клик по категории:', category);
+    console.log('📂 [MainView] Category clicked:', category);
     if (onCategoryClick) {
       onCategoryClick(category);
     }
@@ -115,9 +115,9 @@ const MainView = ({
     return uniqueCategories;
   }, [mainsData]);
 
-  // Обработчик добавления в корзину
+  // Add to cart handler
   const handleAddToCart = useCallback((product) => {
-    console.log('🛒 [MainView] Добавление в корзину:', product);
+    console.log('🛒 [MainView] Adding to cart:', product);
     if (onAddToCart) {
       onAddToCart(product);
     }
@@ -173,7 +173,7 @@ const MainView = ({
     );
   }
 
-  console.log('🏠 [MainView] Рендерим главную страницу с', mainsData.widgets.length, 'виджетами');
+  console.log('🏠 [MainView] Rendering main page with', mainsData.widgets.length, 'widgets');
 
   return (
     <div className="main-view">
@@ -222,7 +222,7 @@ const MainView = ({
               />
             );
           } else {
-            console.warn('⚠️ [MainView] Неизвестный тип виджета:', widget.type);
+            console.warn('⚠️ [MainView] Unknown widget type:', widget.type);
             return null;
           }
         })}
