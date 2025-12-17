@@ -284,12 +284,14 @@ export const fetchProductsList = async (baseUrl, authToken, locale = 'en', categ
   
   // Добавляем page_token только если он не null и не пустая строка (не первая страница)
   // Согласно схеме API, page_token должен быть string и может быть опущен для первой страницы
-  if (pageToken !== null && pageToken !== '') {
+  if (pageToken !== null && pageToken !== undefined && pageToken !== '') {
+    // Явно приводим к строке для соответствия OpenAPI схеме
+    const pageTokenString = String(pageToken);
     console.log('🔄 [fetchProductsList] page_token before sending:', {
-      value: pageToken,
-      type: typeof pageToken
+      value: pageTokenString,
+      type: typeof pageTokenString
     });
-    requestBody.page_token = pageToken;
+    requestBody.page_token = pageTokenString;
   }
 
   console.log('📦 [fetchProductsList] Request body:', requestBody);
