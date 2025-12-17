@@ -56,8 +56,8 @@ const MainView = ({
       setCarouselLoading(prev => ({ ...prev, [categoryId]: true }));
       
       // Загружаем только первую страницу с лимитом 5 (максимум для карусели)
-      // Используем пустой page_token для первой страницы
-      const result = await onLoadProducts(categoryId, '', 5);
+      // Используем null для первой страницы (page_token не включается в запрос)
+      const result = await onLoadProducts(categoryId, null, 5);
       
       setCarouselProducts(prev => ({ 
         ...prev, 

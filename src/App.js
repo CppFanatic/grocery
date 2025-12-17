@@ -304,14 +304,8 @@ function App() {
       // Согласно OpenAPI схеме, ответ содержит объект с полем products и next_page_token
       if (response && response.products && Array.isArray(response.products)) {
         const productsData = response.products;
-        // Убеждаемся, что next_page_token является integer
-        const nextPageToken = response.next_page_token ? parseInt(response.next_page_token, 10) : null;
-        console.log('🔄 [App] next_page_token conversion:', {
-          original: response.next_page_token,
-          type: typeof response.next_page_token,
-          converted: nextPageToken,
-          convertedType: typeof nextPageToken
-        });
+        // next_page_token — строка или null (для последней страницы)
+        const nextPageToken = response.next_page_token ?? null;
         console.log('✅ [App] Продукты загружены:', productsData.length, 'next_page_token:', nextPageToken);
         return { products: productsData, nextPageToken };
       } else {

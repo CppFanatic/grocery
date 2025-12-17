@@ -282,18 +282,13 @@ export const fetchProductsList = async (baseUrl, authToken, locale = 'en', categ
     requestBody.store_id = storeId;
   }
   
-  // page_token должен быть null для первой страницы (поле не включается в запрос)
-  // Для последующих страниц page_token приводится к строке согласно OpenAPI схеме
-  if (pageToken === null || pageToken === undefined || pageToken === '') {
-    console.log('🔄 [fetchProductsList] page_token is null - requesting first page (field omitted from request)');
+  // page_token: null — запрос первой страницы (поле не включается в запрос)
+  // page_token: string — запрос следующей страницы (значение из next_page_token предыдущего ответа)
+  if (pageToken !== null) {
+    console.log('🔄 [fetchProductsList] page_token:', pageToken);
+    requestBody.page_token = pageToken;
   } else {
-    // Явно приводим к строке для соответствия OpenAPI схеме
-    const pageTokenString = String(pageToken);
-    console.log('🔄 [fetchProductsList] page_token before sending:', {
-      value: pageTokenString,
-      type: typeof pageTokenString
-    });
-    requestBody.page_token = pageTokenString;
+    console.log('🔄 [fetchProductsList] page_token is null - requesting first page');
   }
 
   console.log('📦 [fetchProductsList] Request body:', requestBody);

@@ -56,15 +56,9 @@ const CategoryView = ({
           // Заменяем продукты (первая загрузка)
           setProducts(response.products);
         }
-        // Убеждаемся, что next_page_token является integer
-        const nextPageTokenInt = response.next_page_token ? parseInt(response.next_page_token, 10) : null;
-        console.log('🔄 [CategoryView] next_page_token conversion:', {
-          original: response.next_page_token,
-          type: typeof response.next_page_token,
-          converted: nextPageTokenInt,
-          convertedType: typeof nextPageTokenInt
-        });
-        setPageToken(nextPageTokenInt);
+        // next_page_token — строка или null (для последней страницы)
+        const nextPageTokenValue = response.next_page_token ?? null;
+        setPageToken(nextPageTokenValue);
         setHasMore(!!response.next_page_token);
       }
     } catch (err) {
