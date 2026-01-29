@@ -202,7 +202,9 @@ function App() {
     // Optimistic UI update with functional update
     let updatedCart;
     setCart(prevCart => {
-      updatedCart = prevCart.filter(item => item.id !== productId);
+      updatedCart = prevCart.map(item =>
+        item.id === productId ? { ...item, quantity: 0 } : item
+      );
       return updatedCart;
     });
     
@@ -213,23 +215,20 @@ function App() {
   const updateQuantity = useCallback(async (productId, quantity) => {
     console.log('🔢 [App] Updating item quantity:', productId, 'new quantity:', quantity);
     
-    if (quantity <= 0) {
-      await removeFromCart(productId);
-      return;
-    }
+    const safeQuantity = Math.max(0, quantity);
     
     // Optimistic UI update with functional update
     let updatedCart;
     setCart(prevCart => {
       updatedCart = prevCart.map(item =>
-        item.id === productId ? { ...item, quantity } : item
+        item.id === productId ? { ...item, quantity: safeQuantity } : item
       );
       return updatedCart;
     });
     
     // Synchronize with server asynchronously
     setTimeout(() => syncCart(updatedCart), 0);
-  }, [syncCart, removeFromCart]);
+  }, [syncCart]);
 
   const getTotalItems = () => {
     return cart.reduce((total, item) => total + item.quantity, 0);
@@ -321,7 +320,7 @@ function App() {
 
   // Function for checkout
   const handleCheckout = async () => {
-    if (cart.length === 0 || !cartId) {
+    if (getTotalItems() === 0 || !cartId) {
       console.warn('⚠️ [App] Cart is empty or not created');
       return;
     }

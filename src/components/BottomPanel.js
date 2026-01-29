@@ -54,6 +54,7 @@ function BottomPanel({
   const [activeOrders, setActiveOrders] = useState([]);
   const [ordersLoading, setOrdersLoading] = useState(false);
   const pollingIntervalRef = useRef(null);
+  const visibleItems = cart.filter(item => item.quantity > 0);
 
   // Fetch active orders from API
   const fetchActiveOrders = useCallback(async () => {
@@ -195,10 +196,10 @@ function BottomPanel({
             </div>
             
             <div className="cart-items">
-              {cart.length === 0 ? (
+              {visibleItems.length === 0 ? (
                 <p className="empty-cart">Cart is empty</p>
               ) : (
-                cart.map(item => (
+                visibleItems.map(item => (
                   <div key={item.id} className="cart-item">
                     <div className="item-info">
                       <h4>{item.name}</h4>
@@ -215,7 +216,7 @@ function BottomPanel({
               )}
             </div>
             
-            {cart.length > 0 && (
+            {visibleItems.length > 0 && (
               <div className="cart-footer">
                 <div className="total">
                   <strong>Total: ${totalPrice}</strong>
